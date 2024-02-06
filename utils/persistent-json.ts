@@ -13,8 +13,10 @@ export class PersistentJson<T> {
 
   public async get(): Promise<T> {
     if (this.value === undefined) {
-      this.value =
-        JSON.parse(await storage.getItem(this.storageKey), reviver) ?? {}
+      this.value = JSON.parse(
+        (await storage.getItem(this.storageKey)) ?? JSON.stringify({}),
+        reviver
+      )
     }
 
     return this.value
