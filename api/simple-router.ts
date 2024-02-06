@@ -28,13 +28,13 @@ export function registerRoutes(app: Express, storage: Storage) {
     const tasks = await storage.tasks.get()
     if (!tasks[chainId]) {
       res.statusCode = 404
-      res.end("Chain not found")
+      return res.end("Chain not found")
     }
 
     const task = tasks[chainId][taskId.toString()]
     if (!task) {
       res.statusCode = 404
-      res.end("Task not found")
+      return res.end("Task not found")
     }
 
     res.end(JSON.stringify(task, replacer))
@@ -52,7 +52,7 @@ export function registerRoutes(app: Express, storage: Storage) {
 
     if (!event) {
       res.statusCode = 404
-      res.end("Event not found")
+      return res.end("Event not found")
     }
 
     res.end(JSON.stringify(event, replacer))
