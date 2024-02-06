@@ -21,13 +21,17 @@ export function registerRoutes(app: Express, storage: Storage) {
     }
 
     const taskId = parseBigInt(req.params.taskId)
-    if (!taskId) {
+    if (taskId === undefined) {
       return malformedRequest(res, "taskId is not a valid bigint")
     }
 
     const tasks = await storage.tasks.get()
-    const task = tasks[chainId][taskId.toString()]
+    if (!tasks[chainId]) {
+      res.statusCode = 404
+      res.end("Chain not found")
+    }
 
+    const task = tasks[chainId][taskId.toString()]
     if (!task) {
       res.statusCode = 404
       res.end("Task not found")
