@@ -27,6 +27,12 @@ export function registerRoutes(app: Express, storage: Storage) {
 
     const tasks = await storage.tasks.get()
     const task = tasks[chainId][taskId.toString()]
+
+    if (!task) {
+      res.statusCode = 404
+      res.end("Task not found")
+    }
+
     res.end(JSON.stringify(task, replacer))
   })
 
@@ -39,6 +45,11 @@ export function registerRoutes(app: Express, storage: Storage) {
 
     const tasksEvents = await storage.tasksEvents.get()
     const event = tasksEvents[eventIndex]
+
+    if (!event) {
+      res.statusCode = 404
+      res.end("Event not found")
+    }
 
     res.end(JSON.stringify(event, replacer))
   })
