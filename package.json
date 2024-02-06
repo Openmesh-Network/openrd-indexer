@@ -1,0 +1,24 @@
+{
+  "name": "openrd-indexer",
+  "version": "1.0.0",
+  "main": "index.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "rm -rf build && npx tsc",
+    "start": "node build/index.js"
+  },
+  "dependencies": {
+    "axios": "^1.6.7",
+    "dotenv": "^16.4.1",
+    "express": "^4.18.2",
+    "form-data": "^4.0.0",
+    "node-persist": "^4.0.1",
+    "viem": "^2.7.3"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.21",
+    "@types/node": "^20.11.16",
+    "@types/node-persist": "^3.1.8",
+    "typescript": "^5.3.3"
+  }
+}
