@@ -73,9 +73,9 @@ async function start() {
   // Data (memory + json files (synced) currently, could be migrated to a database solution if needed in the future)
   await storageManager.init({ dir: "storage" })
   const storage = {
-    tasks: new PersistentJson<TasksStorage>("tasks"),
-    tasksEvents: new PersistentJson<TasksEventsStorage>("tasksEvents"),
-    users: new PersistentJson<UsersStorage>("users"),
+    tasks: new PersistentJson<TasksStorage>("tasks", {}),
+    tasksEvents: new PersistentJson<TasksEventsStorage>("tasksEvents", []),
+    users: new PersistentJson<UsersStorage>("users", {}),
   }
 
   multichainWatcher.forEach((contractWatcher) => {

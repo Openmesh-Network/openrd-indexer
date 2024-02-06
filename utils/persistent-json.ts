@@ -4,19 +4,21 @@ import { replacer, reviver } from "./json"
 
 export class PersistentJson<T> {
   private storageKey: string
-  private value: any
+  private value?: T
+  private defaultValue: T
 
-  constructor(storageKey: string) {
+  constructor(storageKey: string, defaultValue: T) {
     this.storageKey = storageKey
     this.value = undefined
+    this.defaultValue = defaultValue
   }
 
   public async get(): Promise<T> {
     if (this.value === undefined) {
-      this.value = JSON.parse(
-        (await storage.getItem(this.storageKey)) ?? JSON.stringify({}),
-        reviver
-      )
+      const storedValue = await storage.getItem(this.storageKey)
+      this.value = storedValue
+        ? (JSON.parse(storedValue, reviver) as T)
+        : this.defaultValue
     }
 
     return this.value
