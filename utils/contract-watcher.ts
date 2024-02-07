@@ -17,6 +17,18 @@ export class ContractWatcher {
     [watchId: string]: { start: () => void; stop: () => void }
   }
 
+  public getWatched(): string[] {
+    return Object.keys(this.watching)
+  }
+
+  private refresh(): void {
+    this.getWatched().forEach((watchId) => {
+      this.watching[watchId].stop()
+      this.watching[watchId].start()
+    })
+    setTimeout(this.refresh, 60 * 60 * 1000)
+  }
+
   constructor({
     chain,
     httpRPC,
@@ -49,14 +61,6 @@ export class ContractWatcher {
     // Expose this info for other classes to use
     chains[this.chain.id] = this.chain
     publicClients[this.chain.id] = this.client
-  }
-
-  private refresh(): void {
-    this.getWatched().forEach((watchId) => {
-      this.watching[watchId].stop()
-      this.watching[watchId].start()
-    })
-    setTimeout(this.refresh, 60 * 60 * 1000)
   }
 
   public startWatching<
@@ -100,10 +104,6 @@ export class ContractWatcher {
 
     this.watching[watchId].stop()
     delete this.watching[watchId]
-  }
-
-  public getWatched(): string[] {
-    return Object.keys(this.watching)
   }
 
   public stopAll(): void {
