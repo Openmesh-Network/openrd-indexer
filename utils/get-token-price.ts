@@ -18,6 +18,9 @@ export async function getPrice(
   // Example native MATIC: https://api.coingecko.com/api/v3/simple/price?ids=matic-network&vs_currencies=usd
   // Example polygon USDC: https://api.coingecko.com/api/v3/simple/token_price/polygon-pos?contract_addresses=0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359&vs_currencies=usd
   let total = 0
+  if (chain.testnet) {
+    return 0
+  }
 
   if (nativeBudget > BigInt(0)) {
     const coinId = getCoinOfChain(chain.id)
@@ -81,6 +84,8 @@ export async function getPrice(
 
 function getCoinOfChain(chainId: number): string {
   switch (chainId) {
+    case 1:
+      return "ethereum"
     case 137:
       return "matic-network"
   }
@@ -90,6 +95,8 @@ function getCoinOfChain(chainId: number): string {
 
 function getTokenIdOfChain(chainId: number): string {
   switch (chainId) {
+    case 1:
+      return "ethereum"
     case 137:
       return "polygon-pos"
   }
