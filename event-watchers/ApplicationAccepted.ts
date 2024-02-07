@@ -40,7 +40,7 @@ export async function processApplicationAccepted(
 ): Promise<void> {
   let taskEvent: number
   await storage.tasksEvents.update((tasksEvents) => {
-    taskEvent = tasksEvents.push(event)
+    taskEvent = tasksEvents.push(event) - 1
   })
 
   const taskId = event.taskId.toString()

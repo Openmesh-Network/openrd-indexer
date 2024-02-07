@@ -41,7 +41,7 @@ export async function processTaskCompleted(
 ): Promise<void> {
   let taskEvent: number
   await storage.tasksEvents.update((tasksEvents) => {
-    taskEvent = tasksEvents.push()
+    taskEvent = tasksEvents.push() - 1
   })
 
   const taskId = event.taskId.toString()
