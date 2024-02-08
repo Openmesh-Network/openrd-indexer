@@ -26,7 +26,6 @@ export class ContractWatcher {
       this.watching[watchId].stop()
       this.watching[watchId].start()
     })
-    setTimeout(this.refresh, 60 * 60 * 1000)
   }
 
   constructor({
@@ -56,7 +55,13 @@ export class ContractWatcher {
       transport: webSocket(),
     })
     this.watching = {}
-    this.refresh() // Start refresh loop to keep connection alive
+    setInterval(
+      () => {
+        // Wrapped in a function to have the correct "this"
+        this.refresh()
+      },
+      60 * 60 * 1000
+    ) // Start refresh loop to keep connection alive
 
     // Expose this info for other classes to use
     chains[this.chain.id] = this.chain
