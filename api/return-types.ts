@@ -1,22 +1,22 @@
-import { TaskEvent } from "../types/task-events"
-import { Task } from "../types/tasks"
+import { TaskEvent } from "../types/task-events";
+import { IndexedTask } from "../types/tasks";
 
-export type TaskReturn = Task
+export type TaskReturn = IndexedTask;
 
-export type EventReturn = TaskEvent
+export type EventReturn = TaskEvent;
 
 export interface TotalTasksReturn {
-  totalTasks: number
+  totalTasks: number;
 }
 
 export interface TotalEventsReturn {
-  totalEvents: number
+  totalEvents: number;
 }
 
 export interface TotalUsersReturn {
-  totalUsers: number
+  totalUsers: number;
 }
 
 export interface TotalUsdValueReturn {
-  totalUsdValue: number
+  totalUsdValue: number;
 }

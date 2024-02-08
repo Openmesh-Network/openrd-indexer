@@ -1,35 +1,37 @@
-import { Address } from "viem"
+import { Address } from "viem";
 
 export interface ERC20Transfer {
-  tokenContract: Address
-  amount: bigint
+  tokenContract: Address;
+  amount: bigint;
 }
 
 export interface NativeReward {
-  to: Address
-  amount: bigint
+  to: Address;
+  amount: bigint;
 }
 
 export interface Reward {
-  nextToken: boolean
-  to: Address
-  amount: bigint
+  nextToken: boolean;
+  to: Address;
+  amount: bigint;
 }
 
 export interface Application {
-  metadata: string
-  applicant: Address
-  accepted: boolean
-  nativeReward: NativeReward[]
-  reward: Reward[]
+  metadata: string;
+  applicant: Address;
+  accepted: boolean;
+  nativeReward: NativeReward[];
+  reward: Reward[];
+}
 
-  cachedMetadata: string
+export interface IndexedApplication extends Application {
+  cachedMetadata: string;
 }
 
 export interface PreapprovedApplication {
-  applicant: Address
-  nativeReward: NativeReward[]
-  reward: Reward[]
+  applicant: Address;
+  nativeReward: NativeReward[];
+  reward: Reward[];
 }
 
 export enum SubmissionJudgement {
@@ -39,12 +41,14 @@ export enum SubmissionJudgement {
 }
 
 export interface Submission {
-  metadata: string
-  feedback: string
-  judgement: SubmissionJudgement
+  metadata: string;
+  feedback: string;
+  judgement: SubmissionJudgement;
+}
 
-  cachedMetadata: string
-  cachedFeedback: string
+export interface IndexedSubmission extends Submission {
+  cachedMetadata: string;
+  cachedFeedback: string;
 }
 
 export enum RequestType {
@@ -52,15 +56,17 @@ export enum RequestType {
 }
 
 export interface Request {
-  accepted: boolean
-  executed: boolean
+  accepted: boolean;
+  executed: boolean;
 }
 
 export interface CancelTaskRequest {
-  request: Request
-  metadata: string
+  request: Request;
+  metadata: string;
+}
 
-  cachedMetadata: string
+export interface IndexedCancelTaskRequest extends CancelTaskRequest {
+  cachedMetadata: string;
 }
 
 export enum TaskState {
@@ -70,26 +76,32 @@ export enum TaskState {
 }
 
 export interface Task {
-  metadata: string
-  deadline: bigint
-  executorApplication: number
-  manager: Address
-  disputeManager: Address
-  creator: Address
-  state: TaskState
-  escrow: Address
-  nativeBudget: bigint
-  budget: ERC20Transfer[]
-  applications: { [applicationId: number]: Application }
-  submissions: { [submissionId: number]: Submission }
-  cancelTaskRequests: { [requestId: number]: CancelTaskRequest }
+  metadata: string;
+  deadline: bigint;
+  executorApplication: number;
+  manager: Address;
+  disputeManager: Address;
+  creator: Address;
+  state: TaskState;
+  escrow: Address;
+  nativeBudget: bigint;
+  budget: ERC20Transfer[];
+  applications: { [applicationId: number]: Application };
+  submissions: { [submissionId: number]: Submission };
+  cancelTaskRequests: { [requestId: number]: CancelTaskRequest };
+}
 
-  completionSource?: TaskCompletionSource
-  events: number[]
-  cachedMetadata: string
-  usdValue: number
-  nativePaidOut: bigint[]
-  paidOut: bigint[]
+export interface IndexedTask extends Task {
+  applications: { [applicationId: number]: IndexedApplication };
+  submissions: { [submissionId: number]: IndexedSubmission };
+  cancelTaskRequests: { [requestId: number]: IndexedCancelTaskRequest };
+
+  completionSource?: TaskCompletionSource;
+  events: number[];
+  cachedMetadata: string;
+  usdValue: number;
+  nativePaidOut: bigint[];
+  paidOut: bigint[];
 }
 
 export enum TaskCompletionSource {
