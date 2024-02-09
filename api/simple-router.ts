@@ -5,6 +5,7 @@ import { IndexedTask } from "../types/tasks";
 import { replacer } from "../utils/json";
 import { parseBigInt } from "../utils/parseBigInt";
 import { isAddress } from "viem";
+import { normalizeAddress } from "../event-watchers/userHelpers";
 
 function malformedRequest(res: Response, error: string): void {
   res.statusCode = 400;
@@ -61,13 +62,13 @@ export function registerRoutes(app: Express, storage: Storage) {
 
   // Get single user
   app.get(basePath + "user/:address", async function (req, res) {
-    const address = req.params.address.toLowerCase();
+    const address = req.params.address;
     if (!isAddress(address)) {
       return malformedRequest(res, "address is not a valid address");
     }
 
     const users = await storage.users.get();
-    const user = users[address];
+    const user = users[normalizeAddress(address)];
 
     if (!user) {
       res.statusCode = 404;
