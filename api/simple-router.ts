@@ -61,7 +61,7 @@ export function registerRoutes(app: Express, storage: Storage) {
 
   // Get single user
   app.get(basePath + "user/:address", async function (req, res) {
-    const address = req.params.address;
+    const address = req.params.address.toLowerCase();
     if (!isAddress(address)) {
       return malformedRequest(res, "address is not a valid address");
     }
