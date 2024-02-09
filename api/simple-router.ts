@@ -4,6 +4,7 @@ import { Storage } from "..";
 import { IndexedTask } from "../types/tasks";
 import { replacer } from "../utils/json";
 import { parseBigInt } from "../utils/parseBigInt";
+import { isAddress } from "viem";
 
 function malformedRequest(res: Response, error: string): void {
   res.statusCode = 400;
@@ -56,6 +57,24 @@ export function registerRoutes(app: Express, storage: Storage) {
     }
 
     res.end(JSON.stringify(event, replacer));
+  });
+
+  // Get single user
+  app.get(basePath + "user/:address", async function (req, res) {
+    const address = req.params.address;
+    if (!isAddress(address)) {
+      return malformedRequest(res, "address is not a valid address");
+    }
+
+    const users = await storage.users.get();
+    const user = users[address];
+
+    if (!user) {
+      res.statusCode = 404;
+      return res.end("User not found");
+    }
+
+    res.end(JSON.stringify(user, replacer));
   });
 
   // Get total task count

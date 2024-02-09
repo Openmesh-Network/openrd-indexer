@@ -1,9 +1,12 @@
 import { TaskEvent } from "../types/task-events";
 import { IndexedTask } from "../types/tasks";
+import { User } from "../types/user";
 
 export type TaskReturn = IndexedTask;
 
 export type EventReturn = TaskEvent;
+
+export type UserReturn = User;
 
 export interface TotalTasksReturn {
   totalTasks: number;
