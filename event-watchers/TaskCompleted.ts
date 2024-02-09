@@ -1,14 +1,11 @@
-import { Storage } from ".."
-import { TasksContract } from "../contracts/Tasks"
-import { TaskCompleted } from "../types/task-events"
-import { TaskCompletionSource, TaskState } from "../types/tasks"
-import { ContractWatcher } from "../utils/contract-watcher"
-import { createTaskIfNotExists } from "./taskHelpers"
+import { Storage } from "..";
+import { TasksContract } from "../contracts/Tasks";
+import { TaskCompleted } from "../types/task-events";
+import { TaskCompletionSource, TaskState } from "../types/tasks";
+import { ContractWatcher } from "../utils/contract-watcher";
+import { createTaskIfNotExists } from "./taskHelpers";
 
-export function watchTaskCompleted(
-  contractWatcher: ContractWatcher,
-  storage: Storage
-) {
+export function watchTaskCompleted(contractWatcher: ContractWatcher, storage: Storage) {
   contractWatcher.startWatching("TaskCompleted", {
     abi: TasksContract.abi,
     address: TasksContract.address,
@@ -17,7 +14,7 @@ export function watchTaskCompleted(
     onLogs: async (logs) => {
       await Promise.all(
         logs.map(async (log) => {
-          const { args, blockNumber, transactionHash, address } = log
+          const { args, blockNumber, transactionHash, address } = log;
 
           const event = {
             type: "TaskCompleted",
@@ -26,62 +23,53 @@ export function watchTaskCompleted(
             chainId: contractWatcher.chain.id,
             address: address,
             ...args,
-          } as TaskCompleted
+          } as TaskCompleted;
 
-          await processTaskCompleted(event, storage)
+          await processTaskCompleted(event, storage);
         })
-      )
+      );
     },
-  })
+  });
 }
 
-export async function processTaskCompleted(
-  event: TaskCompleted,
-  storage: Storage
-): Promise<void> {
-  let taskEvent: number
+export async function processTaskCompleted(event: TaskCompleted, storage: Storage): Promise<void> {
+  let taskEvent: number;
   await storage.tasksEvents.update((tasksEvents) => {
-    taskEvent = tasksEvents.push() - 1
-  })
+    taskEvent = tasksEvents.push(event) - 1;
+  });
 
-  const taskId = event.taskId.toString()
+  const taskId = event.taskId.toString();
   await storage.tasks.update((tasks) => {
-    createTaskIfNotExists(tasks, event.chainId, taskId)
-    const task = tasks[event.chainId][taskId]
-    task.state = TaskState.Closed
-    task.completionSource = event.source
+    createTaskIfNotExists(tasks, event.chainId, taskId);
+    const task = tasks[event.chainId][taskId];
+    task.state = TaskState.Closed;
+    task.completionSource = event.source;
 
     if (event.source == TaskCompletionSource.SubmissionAccepted) {
       // Full reward is paid out
       if (task.applications[task.executorApplication]) {
-        task.applications[task.executorApplication].nativeReward.forEach(
-          (nativeReward, i) => {
-            if (!task.nativePaidOut[i]) {
-              task.nativePaidOut[i] = BigInt(0)
-            }
-
-            task.nativePaidOut[i] += nativeReward.amount
+        task.applications[task.executorApplication].nativeReward.forEach((nativeReward, i) => {
+          if (!task.nativePaidOut[i]) {
+            task.nativePaidOut[i] = BigInt(0);
           }
-        )
 
-        task.applications[task.executorApplication].reward.forEach(
-          (reward, i) => {
-            if (!task.paidOut[i]) {
-              task.paidOut[i] = BigInt(0)
-            }
+          task.nativePaidOut[i] += nativeReward.amount;
+        });
 
-            task.paidOut[i] += reward.amount
+        task.applications[task.executorApplication].reward.forEach((reward, i) => {
+          if (!task.paidOut[i]) {
+            task.paidOut[i] = BigInt(0);
           }
-        )
+
+          task.paidOut[i] += reward.amount;
+        });
       } else {
-        console.warn(
-          `Executor application of ${event.chainId}-${taskId} not found when completing task.`
-        )
+        console.warn(`Executor application of ${event.chainId}-${taskId} not found when completing task.`);
       }
     } // Dispute will trigger PartialPayment
 
     // Doesnt keep track of the budget refunded to the proposer
 
-    task.events.push(taskEvent)
-  })
+    task.events.push(taskEvent);
+  });
 }

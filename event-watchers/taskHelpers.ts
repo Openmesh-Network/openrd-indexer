@@ -1,25 +1,16 @@
-import { zeroAddress } from "viem"
+import { zeroAddress } from "viem";
 
-import { TasksStorage } from ".."
-import {
-  Request,
-  RequestType,
-  SubmissionJudgement,
-  TaskState,
-} from "../types/tasks"
+import { TasksStorage } from "..";
+import { Request, RequestType, SubmissionJudgement, TaskState } from "../types/tasks";
 
 export function createNetworkIfNotExists(tasks: TasksStorage, chainId: number) {
   if (!tasks[chainId]) {
-    tasks[chainId] = {}
+    tasks[chainId] = {};
   }
 }
 
-export function createTaskIfNotExists(
-  tasks: TasksStorage,
-  chainId: number,
-  taskId: string
-): void {
-  createNetworkIfNotExists(tasks, chainId)
+export function createTaskIfNotExists(tasks: TasksStorage, chainId: number, taskId: string): void {
+  createNetworkIfNotExists(tasks, chainId);
   if (!tasks[chainId][taskId]) {
     tasks[chainId][taskId] = {
       applications: [],
@@ -41,17 +32,12 @@ export function createTaskIfNotExists(
       usdValue: 0,
       nativePaidOut: [],
       paidOut: [],
-    }
+    };
   }
 }
 
-export function createApplicationIfNotExists(
-  tasks: TasksStorage,
-  chainId: number,
-  taskId: string,
-  applicationId: number
-): void {
-  createTaskIfNotExists(tasks, chainId, taskId)
+export function createApplicationIfNotExists(tasks: TasksStorage, chainId: number, taskId: string, applicationId: number): void {
+  createTaskIfNotExists(tasks, chainId, taskId);
   if (!tasks[chainId][taskId].applications[applicationId]) {
     tasks[chainId][taskId].applications[applicationId] = {
       accepted: false,
@@ -61,17 +47,12 @@ export function createApplicationIfNotExists(
       reward: [],
 
       cachedMetadata: "",
-    }
+    };
   }
 }
 
-export function createSubmissionIfNotExists(
-  tasks: TasksStorage,
-  chainId: number,
-  taskId: string,
-  submissionId: number
-): void {
-  createTaskIfNotExists(tasks, chainId, taskId)
+export function createSubmissionIfNotExists(tasks: TasksStorage, chainId: number, taskId: string, submissionId: number): void {
+  createTaskIfNotExists(tasks, chainId, taskId);
   if (!tasks[chainId][taskId].submissions[submissionId]) {
     tasks[chainId][taskId].submissions[submissionId] = {
       feedback: "",
@@ -80,17 +61,12 @@ export function createSubmissionIfNotExists(
 
       cachedFeedback: "",
       cachedMetadata: "",
-    }
+    };
   }
 }
 
-export function createCancelTaskRequestIfNotExists(
-  tasks: TasksStorage,
-  chainId: number,
-  taskId: string,
-  requestId: number
-): void {
-  createTaskIfNotExists(tasks, chainId, taskId)
+export function createCancelTaskRequestIfNotExists(tasks: TasksStorage, chainId: number, taskId: string, requestId: number): void {
+  createTaskIfNotExists(tasks, chainId, taskId);
   if (!tasks[chainId][taskId].cancelTaskRequests[requestId]) {
     tasks[chainId][taskId].cancelTaskRequests[requestId] = {
       metadata: "",
@@ -100,20 +76,14 @@ export function createCancelTaskRequestIfNotExists(
       },
 
       cachedMetadata: "",
-    }
+    };
   }
 }
 
-export function getRequest(
-  tasks: TasksStorage,
-  chainId: number,
-  taskId: string,
-  requestType: RequestType,
-  requestId: number
-): Request | undefined {
+export function getRequest(tasks: TasksStorage, chainId: number, taskId: string, requestType: RequestType, requestId: number): Request | undefined {
   switch (requestType) {
     case RequestType.CancelTask:
-      createCancelTaskRequestIfNotExists(tasks, chainId, taskId, requestId)
-      return tasks[chainId][taskId].cancelTaskRequests[requestId].request
+      createCancelTaskRequestIfNotExists(tasks, chainId, taskId, requestId);
+      return tasks[chainId][taskId].cancelTaskRequests[requestId].request;
   }
 }

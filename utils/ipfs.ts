@@ -1,14 +1,14 @@
-import axios from "axios"
+import axios from "axios";
 
-const FormData = require("form-data")
+const FormData = require("form-data");
 
-const IPFSUrl = "https://test.ipfs.aragon.network/api/v0" // "https://prod.ipfs.aragon.network/api/v0"
-const APIKey = "b477RhECf8s8sdM7XrkLBs2wHc4kCMwpbcFC55Kt" // Publicly known Aragon IPFS node API key
+const IPFSUrl = "https://test.ipfs.aragon.network/api/v0"; // "https://prod.ipfs.aragon.network/api/v0"
+const APIKey = "b477RhECf8s8sdM7XrkLBs2wHc4kCMwpbcFC55Kt"; // Publicly known Aragon IPFS node API key
 
 /** Upload a file to the cluster and pin it */
 export async function addToIpfs(json: string): Promise<string> {
-  let data = new FormData()
-  data.append("path", json)
+  let data = new FormData();
+  data.append("path", json);
 
   const config = {
     method: "POST",
@@ -17,10 +17,10 @@ export async function addToIpfs(json: string): Promise<string> {
       "X-API-KEY": APIKey,
     },
     data: data,
-  }
+  };
 
-  const res = await axios(config)
-  return res.data.Hash
+  const res = await axios(config);
+  return res.data.Hash;
 }
 
 export async function getFromIpfs(hash: string): Promise<any> {
@@ -30,8 +30,8 @@ export async function getFromIpfs(hash: string): Promise<any> {
     headers: {
       "X-API-KEY": APIKey,
     },
-  }
+  };
 
-  const res = await axios(config)
-  return res.data
+  const res = await axios(config);
+  return res.data;
 }

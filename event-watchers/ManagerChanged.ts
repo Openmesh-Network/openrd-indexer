@@ -1,20 +1,14 @@
-import { Address } from "viem"
+import { Address } from "viem";
 
-import { Storage } from ".."
-import { TasksContract } from "../contracts/Tasks"
-import { ManagerChanged } from "../types/task-events"
-import { TaskRole } from "../types/user"
-import { ContractWatcher } from "../utils/contract-watcher"
-import { createTaskIfNotExists } from "./taskHelpers"
-import {
-  createUserTaskNetworkIfNotExists,
-  normalizeAddress,
-} from "./userHelpers"
+import { Storage } from "..";
+import { TasksContract } from "../contracts/Tasks";
+import { ManagerChanged } from "../types/task-events";
+import { TaskRole } from "../types/user";
+import { ContractWatcher } from "../utils/contract-watcher";
+import { createTaskIfNotExists } from "./taskHelpers";
+import { createUserTaskNetworkIfNotExists, normalizeAddress } from "./userHelpers";
 
-export function watchManagerChanged(
-  contractWatcher: ContractWatcher,
-  storage: Storage
-) {
+export function watchManagerChanged(contractWatcher: ContractWatcher, storage: Storage) {
   contractWatcher.startWatching("ManagerChanged", {
     abi: TasksContract.abi,
     address: TasksContract.address,
@@ -23,7 +17,7 @@ export function watchManagerChanged(
     onLogs: async (logs) => {
       await Promise.all(
         logs.map(async (log) => {
-          const { args, blockNumber, transactionHash, address } = log
+          const { args, blockNumber, transactionHash, address } = log;
 
           const event = {
             type: "ManagerChanged",
@@ -32,55 +26,44 @@ export function watchManagerChanged(
             chainId: contractWatcher.chain.id,
             address: address,
             ...args,
-          } as ManagerChanged
+          } as ManagerChanged;
 
-          await processManagerChanged(event, storage)
+          await processManagerChanged(event, storage);
         })
-      )
+      );
     },
-  })
+  });
 }
 
-export async function processManagerChanged(
-  event: ManagerChanged,
-  storage: Storage
-): Promise<void> {
-  let taskEvent: number
+export async function processManagerChanged(event: ManagerChanged, storage: Storage): Promise<void> {
+  let taskEvent: number;
   await storage.tasksEvents.update((tasksEvents) => {
-    taskEvent = tasksEvents.push() - 1
-  })
+    taskEvent = tasksEvents.push(event) - 1;
+  });
 
-  let oldManager: Address
-  const taskId = event.taskId.toString()
+  let oldManager: Address;
+  const taskId = event.taskId.toString();
   await storage.tasks.update((tasks) => {
-    createTaskIfNotExists(tasks, event.chainId, taskId)
-    const task = tasks[event.chainId][taskId]
-    oldManager = task.manager
-    task.manager = event.newManager
+    createTaskIfNotExists(tasks, event.chainId, taskId);
+    const task = tasks[event.chainId][taskId];
+    oldManager = task.manager;
+    task.manager = event.newManager;
 
-    task.events.push(taskEvent)
-  })
+    task.events.push(taskEvent);
+  });
 
   await storage.users.update((users) => {
-    const manager = normalizeAddress(event.newManager)
-    createUserTaskNetworkIfNotExists(users, manager, event.chainId)
-    users[manager].tasks[event.chainId][taskId].push(TaskRole.Manager)
+    const manager = normalizeAddress(event.newManager);
+    createUserTaskNetworkIfNotExists(users, manager, event.chainId);
+    users[manager].tasks[event.chainId][taskId].push(TaskRole.Manager);
 
-    if (
-      users[oldManager]?.tasks &&
-      users[oldManager].tasks[event.chainId] &&
-      users[oldManager].tasks[event.chainId][taskId]
-    ) {
-      const index = users[oldManager].tasks[event.chainId][taskId].indexOf(
-        TaskRole.Manager
-      )
+    if (users[oldManager]?.tasks && users[oldManager].tasks[event.chainId] && users[oldManager].tasks[event.chainId][taskId]) {
+      const index = users[oldManager].tasks[event.chainId][taskId].indexOf(TaskRole.Manager);
       if (index == -1) {
-        console.warn(
-          `Old manager role from ${oldManager} (${event.chainId}-${taskId}) not found.`
-        )
+        console.warn(`Old manager role from ${oldManager} (${event.chainId}-${taskId}) not found.`);
       } else {
-        users[oldManager].tasks[event.chainId][taskId].splice(index, 1)
+        users[oldManager].tasks[event.chainId][taskId].splice(index, 1);
       }
     }
-  })
+  });
 }

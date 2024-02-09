@@ -1,13 +1,10 @@
-import { Storage } from ".."
-import { TasksContract } from "../contracts/Tasks"
-import { PartialPayment } from "../types/task-events"
-import { ContractWatcher } from "../utils/contract-watcher"
-import { createTaskIfNotExists } from "./taskHelpers"
+import { Storage } from "..";
+import { TasksContract } from "../contracts/Tasks";
+import { PartialPayment } from "../types/task-events";
+import { ContractWatcher } from "../utils/contract-watcher";
+import { createTaskIfNotExists } from "./taskHelpers";
 
-export function watchPartialPayment(
-  contractWatcher: ContractWatcher,
-  storage: Storage
-) {
+export function watchPartialPayment(contractWatcher: ContractWatcher, storage: Storage) {
   contractWatcher.startWatching("PartialPayment", {
     abi: TasksContract.abi,
     address: TasksContract.address,
@@ -16,7 +13,7 @@ export function watchPartialPayment(
     onLogs: async (logs) => {
       await Promise.all(
         logs.map(async (log) => {
-          const { args, blockNumber, transactionHash, address } = log
+          const { args, blockNumber, transactionHash, address } = log;
 
           const event = {
             type: "PartialPayment",
@@ -25,45 +22,42 @@ export function watchPartialPayment(
             chainId: contractWatcher.chain.id,
             address: address,
             ...args,
-          } as PartialPayment
+          } as PartialPayment;
 
-          await processPartialPayment(event, storage)
+          await processPartialPayment(event, storage);
         })
-      )
+      );
     },
-  })
+  });
 }
 
-export async function processPartialPayment(
-  event: PartialPayment,
-  storage: Storage
-): Promise<void> {
-  let taskEvent: number
+export async function processPartialPayment(event: PartialPayment, storage: Storage): Promise<void> {
+  let taskEvent: number;
   await storage.tasksEvents.update((tasksEvents) => {
-    taskEvent = tasksEvents.push(event) - 1
-  })
+    taskEvent = tasksEvents.push(event) - 1;
+  });
 
-  const taskId = event.taskId.toString()
+  const taskId = event.taskId.toString();
   await storage.tasks.update((tasks) => {
-    createTaskIfNotExists(tasks, event.chainId, taskId)
-    const task = tasks[event.chainId][taskId]
+    createTaskIfNotExists(tasks, event.chainId, taskId);
+    const task = tasks[event.chainId][taskId];
     event.partialNativeReward.forEach((nativeReward, i) => {
       if (!task.nativePaidOut[i]) {
-        task.nativePaidOut[i] = BigInt(0)
+        task.nativePaidOut[i] = BigInt(0);
       }
 
-      task.nativePaidOut[i] += nativeReward
-    })
+      task.nativePaidOut[i] += nativeReward;
+    });
     event.partialReward.forEach((reward, i) => {
       if (!task.paidOut[i]) {
-        task.paidOut[i] = BigInt(0)
+        task.paidOut[i] = BigInt(0);
       }
 
-      task.paidOut[i] += reward
-    })
+      task.paidOut[i] += reward;
+    });
 
-    task.events.push(taskEvent)
-  })
+    task.events.push(taskEvent);
+  });
 
   // Do we also wanna keep track of the usd value of the payout?
 }

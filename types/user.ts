@@ -9,8 +9,8 @@ export enum TaskRole {
 export interface User {
   tasks: {
     [chainId: number]: {
-      [taskId: string]: TaskRole[]
-    }
-  }
-  metadata: string
+      [taskId: string]: TaskRole[];
+    };
+  };
+  metadata: string;
 }

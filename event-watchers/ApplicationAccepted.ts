@@ -1,13 +1,10 @@
-import { Storage } from ".."
-import { TasksContract } from "../contracts/Tasks"
-import { ApplicationAccepted } from "../types/task-events"
-import { ContractWatcher } from "../utils/contract-watcher"
-import { createApplicationIfNotExists } from "./taskHelpers"
+import { Storage } from "..";
+import { TasksContract } from "../contracts/Tasks";
+import { ApplicationAccepted } from "../types/task-events";
+import { ContractWatcher } from "../utils/contract-watcher";
+import { createApplicationIfNotExists } from "./taskHelpers";
 
-export function watchApplicationAccepted(
-  contractWatcher: ContractWatcher,
-  storage: Storage
-) {
+export function watchApplicationAccepted(contractWatcher: ContractWatcher, storage: Storage) {
   contractWatcher.startWatching("ApplicationAccepted", {
     abi: TasksContract.abi,
     address: TasksContract.address,
@@ -16,7 +13,7 @@ export function watchApplicationAccepted(
     onLogs: async (logs) => {
       await Promise.all(
         logs.map(async (log) => {
-          const { args, blockNumber, transactionHash, address } = log
+          const { args, blockNumber, transactionHash, address } = log;
 
           const event = {
             type: "ApplicationAccepted",
@@ -25,36 +22,28 @@ export function watchApplicationAccepted(
             chainId: contractWatcher.chain.id,
             address: address,
             ...args,
-          } as ApplicationAccepted
+          } as ApplicationAccepted;
 
-          await processApplicationAccepted(event, storage)
+          await processApplicationAccepted(event, storage);
         })
-      )
+      );
     },
-  })
+  });
 }
 
-export async function processApplicationAccepted(
-  event: ApplicationAccepted,
-  storage: Storage
-): Promise<void> {
-  let taskEvent: number
+export async function processApplicationAccepted(event: ApplicationAccepted, storage: Storage): Promise<void> {
+  let taskEvent: number;
   await storage.tasksEvents.update((tasksEvents) => {
-    taskEvent = tasksEvents.push(event) - 1
-  })
+    taskEvent = tasksEvents.push(event) - 1;
+  });
 
-  const taskId = event.taskId.toString()
+  const taskId = event.taskId.toString();
   await storage.tasks.update((tasks) => {
-    createApplicationIfNotExists(
-      tasks,
-      event.chainId,
-      taskId,
-      event.applicationId
-    )
-    const task = tasks[event.chainId][taskId]
-    const application = task.applications[event.applicationId]
-    application.accepted = true
+    createApplicationIfNotExists(tasks, event.chainId, taskId, event.applicationId);
+    const task = tasks[event.chainId][taskId];
+    const application = task.applications[event.applicationId];
+    application.accepted = true;
 
-    task.events.push(taskEvent)
-  })
+    task.events.push(taskEvent);
+  });
 }

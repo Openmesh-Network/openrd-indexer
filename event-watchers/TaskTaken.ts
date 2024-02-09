@@ -1,16 +1,13 @@
-import { Storage } from ".."
-import { TasksContract } from "../contracts/Tasks"
-import { TaskTaken } from "../types/task-events"
-import { TaskState } from "../types/tasks"
-import { TaskRole } from "../types/user"
-import { ContractWatcher } from "../utils/contract-watcher"
-import { createApplicationIfNotExists } from "./taskHelpers"
-import { createUserTaskIfNotExists, normalizeAddress } from "./userHelpers"
+import { Storage } from "..";
+import { TasksContract } from "../contracts/Tasks";
+import { TaskTaken } from "../types/task-events";
+import { TaskState } from "../types/tasks";
+import { TaskRole } from "../types/user";
+import { ContractWatcher } from "../utils/contract-watcher";
+import { createApplicationIfNotExists } from "./taskHelpers";
+import { createUserTaskIfNotExists, normalizeAddress } from "./userHelpers";
 
-export function watchTaskTaken(
-  contractWatcher: ContractWatcher,
-  storage: Storage
-) {
+export function watchTaskTaken(contractWatcher: ContractWatcher, storage: Storage) {
   contractWatcher.startWatching("TaskTaken", {
     abi: TasksContract.abi,
     address: TasksContract.address,
@@ -19,7 +16,7 @@ export function watchTaskTaken(
     onLogs: async (logs) => {
       await Promise.all(
         logs.map(async (log) => {
-          const { args, blockNumber, transactionHash, address } = log
+          const { args, blockNumber, transactionHash, address } = log;
 
           const event = {
             type: "TaskTaken",
@@ -28,53 +25,39 @@ export function watchTaskTaken(
             chainId: contractWatcher.chain.id,
             address: address,
             ...args,
-          } as TaskTaken
+          } as TaskTaken;
 
-          await processTaskTaken(event, storage)
+          await processTaskTaken(event, storage);
         })
-      )
+      );
     },
-  })
+  });
 }
 
-export async function processTaskTaken(
-  event: TaskTaken,
-  storage: Storage
-): Promise<void> {
-  let taskEvent: number
+export async function processTaskTaken(event: TaskTaken, storage: Storage): Promise<void> {
+  let taskEvent: number;
   await storage.tasksEvents.update((tasksEvents) => {
-    taskEvent = tasksEvents.push(event) - 1
-  })
+    taskEvent = tasksEvents.push(event) - 1;
+  });
 
-  const taskId = event.taskId.toString()
+  const taskId = event.taskId.toString();
   await storage.tasks.update((tasks) => {
-    createApplicationIfNotExists(
-      tasks,
-      event.chainId,
-      taskId,
-      event.applicationId
-    )
-    const task = tasks[event.chainId][taskId]
-    task.state = TaskState.Taken
-    task.executorApplication = event.applicationId
+    createApplicationIfNotExists(tasks, event.chainId, taskId, event.applicationId);
+    const task = tasks[event.chainId][taskId];
+    task.state = TaskState.Taken;
+    task.executorApplication = event.applicationId;
 
-    task.events.push(taskEvent)
-  })
+    task.events.push(taskEvent);
+  });
 
-  const application = await storage.tasks
-    .get()
-    .then(
-      (task) => task[event.chainId][taskId].applications[event.applicationId]
-    )
+  const application = await storage.tasks.get().then((task) => task[event.chainId][taskId].applications[event.applicationId]);
   if (!application) {
-    console.warn(
-      `Task taken ${event.chainId}-${taskId}, but application ${event.applicationId} wasnt found.`
-    )
+    console.warn(`Task taken ${event.chainId}-${taskId}, but application ${event.applicationId} wasnt found.`);
   } else {
     await storage.users.update((users) => {
-      const executor = normalizeAddress(application.applicant)
-      createUserTaskIfNotExists(users, executor, event.chainId, taskId)
-      users[executor].tasks[event.chainId][taskId].push(TaskRole.Executor)
-    })
+      const executor = normalizeAddress(application.applicant);
+      createUserTaskIfNotExists(users, executor, event.chainId, taskId);
+      users[executor].tasks[event.chainId][taskId].push(TaskRole.Executor);
+    });
   }
 }

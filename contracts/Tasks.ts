@@ -58,9 +58,7 @@ export const TasksContract = {
           ],
         },
       ],
-      outputs: [
-        { name: "applicationId", type: "uint32", internalType: "uint32" },
-      ],
+      outputs: [{ name: "applicationId", type: "uint32", internalType: "uint32" }],
       stateMutability: "nonpayable",
     },
     {
@@ -378,9 +376,7 @@ export const TasksContract = {
     {
       type: "function",
       name: "getTasks",
-      inputs: [
-        { name: "_taskIds", type: "uint256[]", internalType: "uint256[]" },
-      ],
+      inputs: [{ name: "_taskIds", type: "uint256[]", internalType: "uint256[]" }],
       outputs: [
         {
           name: "",
@@ -1107,4 +1103,4 @@ export const TasksContract = {
     { type: "error", name: "TaskNotOpen", inputs: [] },
     { type: "error", name: "TaskNotTaken", inputs: [] },
   ],
-} as const
+} as const;

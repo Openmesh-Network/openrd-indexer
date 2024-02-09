@@ -1,14 +1,11 @@
-import { Storage } from ".."
-import { TasksContract } from "../contracts/Tasks"
-import { RequestExecuted } from "../types/task-events"
-import { Request, RequestType } from "../types/tasks"
-import { ContractWatcher } from "../utils/contract-watcher"
-import { createCancelTaskRequestIfNotExists, getRequest } from "./taskHelpers"
+import { Storage } from "..";
+import { TasksContract } from "../contracts/Tasks";
+import { RequestExecuted } from "../types/task-events";
+import { Request, RequestType } from "../types/tasks";
+import { ContractWatcher } from "../utils/contract-watcher";
+import { createCancelTaskRequestIfNotExists, getRequest } from "./taskHelpers";
 
-export function watchRequestExecuted(
-  contractWatcher: ContractWatcher,
-  storage: Storage
-) {
+export function watchRequestExecuted(contractWatcher: ContractWatcher, storage: Storage) {
   contractWatcher.startWatching("RequestExecuted", {
     abi: TasksContract.abi,
     address: TasksContract.address,
@@ -17,7 +14,7 @@ export function watchRequestExecuted(
     onLogs: async (logs) => {
       await Promise.all(
         logs.map(async (log) => {
-          const { args, blockNumber, transactionHash, address } = log
+          const { args, blockNumber, transactionHash, address } = log;
 
           const event = {
             type: "RequestExecuted",
@@ -26,43 +23,32 @@ export function watchRequestExecuted(
             chainId: contractWatcher.chain.id,
             address: address,
             ...args,
-          } as RequestExecuted
+          } as RequestExecuted;
 
-          await processRequestExecuted(event, storage)
+          await processRequestExecuted(event, storage);
         })
-      )
+      );
     },
-  })
+  });
 }
 
-export async function processRequestExecuted(
-  event: RequestExecuted,
-  storage: Storage
-): Promise<void> {
-  let taskEvent: number
+export async function processRequestExecuted(event: RequestExecuted, storage: Storage): Promise<void> {
+  let taskEvent: number;
   await storage.tasksEvents.update((tasksEvents) => {
-    taskEvent = tasksEvents.push() - 1
-  })
+    taskEvent = tasksEvents.push(event) - 1;
+  });
 
-  const taskId = event.taskId.toString()
+  const taskId = event.taskId.toString();
   await storage.tasks.update((tasks) => {
-    const request = getRequest(
-      tasks,
-      event.chainId,
-      taskId,
-      event.requestType,
-      event.requestId
-    )
-    const task = tasks[event.chainId][taskId]
+    const request = getRequest(tasks, event.chainId, taskId, event.requestType, event.requestId);
+    const task = tasks[event.chainId][taskId];
 
     if (!request) {
-      console.warn(
-        `Request accepted with type ${event.requestType} did not match any known types. Ignored.`
-      )
-      return
+      console.warn(`Request accepted with type ${event.requestType} did not match any known types. Ignored.`);
+      return;
     }
-    request.executed = true
+    request.executed = true;
 
-    task.events.push(taskEvent)
-  })
+    task.events.push(taskEvent);
+  });
 }
