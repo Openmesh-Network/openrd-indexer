@@ -13,7 +13,7 @@ function malformedRequest(res: Response, error: string): void {
 }
 
 export function registerRoutes(app: Express, storage: Storage) {
-  const basePath = "/api/";
+  const basePath = "/indexer/";
 
   // Get single task
   app.get(basePath + "task/:chainId/:taskId", async function (req, res) {
