@@ -1,11 +1,12 @@
 import { Express, Response } from "express";
 
 import { Storage } from "..";
-import { IndexedTask } from "../types/tasks";
-import { replacer } from "../utils/json";
+import { IndexedTask, TaskState } from "../types/tasks";
+import { replacer, reviver } from "../utils/json";
 import { parseBigInt } from "../utils/parseBigInt";
 import { isAddress } from "viem";
 import { normalizeAddress } from "../event-watchers/userHelpers";
+import { ObjectFilter, passesObjectFilter } from "./filter";
 
 function malformedRequest(res: Response, error: string): void {
   res.statusCode = 400;
@@ -78,11 +79,42 @@ export function registerRoutes(app: Express, storage: Storage) {
     res.end(JSON.stringify(user, replacer));
   });
 
+  // Get all tasks that pass a certain filter
+  app.get(basePath + "filterTasks/:filter", async function (req, res) {
+    try {
+      const filter: ObjectFilter = JSON.parse(req.params.filter, reviver);
+
+      const tasks = await storage.tasks.get();
+      const filterTasks = Object.keys(tasks)
+        .map((chainId) =>
+          Object.keys(tasks[chainId as any as number]).map((taskId) => {
+            return { chainId: chainId as any as number, taskId: BigInt(taskId) };
+          })
+        )
+        .flat(1)
+        .filter((taskInfo) => {
+          const task = {
+            ...taskInfo,
+            ...tasks[taskInfo.chainId][taskInfo.taskId.toString()],
+          };
+          if (filter.cachedMetadata) {
+            task.cachedMetadata = JSON.parse(task.cachedMetadata, reviver);
+          }
+          return passesObjectFilter(task, filter);
+        });
+
+      res.end(JSON.stringify({ filterTasks: filterTasks }));
+    } catch (error) {
+      res.statusCode = 500;
+      res.end(JSON.stringify({ error: JSON.stringify(error) }));
+    }
+  });
+
   // Get total task count
   app.get(basePath + "totalTasks", async function (_, res) {
     const tasks = await storage.tasks.get();
     const totalTasks = Object.values(tasks)
-      .map((chainTasks) => Object.keys(chainTasks))
+      .map((chainTasks) => Object.values(chainTasks))
       .flat(1).length;
 
     res.end(JSON.stringify({ totalTasks: totalTasks }));
@@ -114,5 +146,21 @@ export function registerRoutes(app: Express, storage: Storage) {
       .reduce((sum, val) => (sum += val), 0);
 
     res.end(JSON.stringify({ totalUsdValue: totalUsdValue }));
+  });
+
+  // Get total task count with a certain state
+  app.get(basePath + "totalTasksWithState/:state", async function (req, res) {
+    const state = parseInt(req.params.state);
+    if (Number.isNaN(state)) {
+      return malformedRequest(res, "state is not a valid number");
+    }
+
+    const tasks = await storage.tasks.get();
+    const totalTasksWithState = Object.values(tasks)
+      .map((chainTasks: { [taskId: string]: IndexedTask }) => Object.values(chainTasks))
+      .flat(1)
+      .filter((task) => task.state === state).length;
+
+    res.end(JSON.stringify({ totalTasksWithState: totalTasksWithState }));
   });
 }

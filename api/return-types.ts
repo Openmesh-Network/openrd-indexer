@@ -1,3 +1,4 @@
+import { TasksStorage } from "..";
 import { TaskEvent } from "../types/task-events";
 import { IndexedTask } from "../types/tasks";
 import { User } from "../types/user";
@@ -7,6 +8,8 @@ export type TaskReturn = IndexedTask;
 export type EventReturn = TaskEvent;
 
 export type UserReturn = User;
+
+export type FilterTasksReturn = { chainId: number; taskId: bigint }[];
 
 export interface TotalTasksReturn {
   totalTasks: number;
@@ -22,4 +25,8 @@ export interface TotalUsersReturn {
 
 export interface TotalUsdValueReturn {
   totalUsdValue: number;
+}
+
+export interface TotalTasksWithStateReturn {
+  totalTasksWithState: number;
 }
