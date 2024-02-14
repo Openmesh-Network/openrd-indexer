@@ -3,6 +3,7 @@ export interface Filter {
   max?: number | bigint;
   equal?: string | number | bigint;
   contains?: string | any[];
+  oneOf?: Filter[];
   objectFilter?: ObjectFilter;
 }
 
@@ -40,6 +41,11 @@ export function passesFilter(value: any, filter: Filter): boolean {
   }
   if (filter.contains) {
     if (!value.contains(filter.contains)) {
+      return false;
+    }
+  }
+  if (filter.oneOf) {
+    if (!filter.oneOf.some((f) => passesFilter(value, f))) {
       return false;
     }
   }

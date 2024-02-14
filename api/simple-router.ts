@@ -1,7 +1,7 @@
-import { Express, Response } from "express";
+import { Express, Response, json } from "express";
 
 import { Storage } from "..";
-import { IndexedTask, TaskState } from "../types/tasks";
+import { IndexedTask } from "../types/tasks";
 import { replacer, reviver } from "../utils/json";
 import { parseBigInt } from "../utils/parseBigInt";
 import { isAddress } from "viem";
@@ -15,6 +15,7 @@ function malformedRequest(res: Response, error: string): void {
 
 export function registerRoutes(app: Express, storage: Storage) {
   const basePath = "/indexer/";
+  app.use(json());
 
   // Get single task
   app.get(basePath + "task/:chainId/:taskId", async function (req, res) {
@@ -80,9 +81,9 @@ export function registerRoutes(app: Express, storage: Storage) {
   });
 
   // Get all tasks that pass a certain filter
-  app.get(basePath + "filterTasks/:filter", async function (req, res) {
+  app.post(basePath + "filterTasks", async function (req, res) {
     try {
-      const filter: ObjectFilter = JSON.parse(req.params.filter, reviver);
+      const filter: ObjectFilter = JSON.parse(JSON.stringify(req.body), reviver);
 
       const tasks = await storage.tasks.get();
       const filterTasks = Object.keys(tasks)
