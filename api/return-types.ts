@@ -10,6 +10,8 @@ export type UserReturn = User;
 
 export type FilterTasksReturn = { chainId: number; taskId: bigint }[];
 
+export type UserEventsReturn = number[];
+
 export interface TotalTasksReturn {
   totalTasks: number;
 }
