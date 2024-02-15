@@ -104,7 +104,7 @@ export function registerRoutes(app: Express, storage: Storage) {
           return passesObjectFilter(task, filter);
         });
 
-      res.end(JSON.stringify({ filterTasks: filterTasks }, replacer));
+      res.end(JSON.stringify(filterTasks, replacer));
     } catch (error) {
       res.statusCode = 500;
       res.end(JSON.stringify({ error: JSON.stringify(error, replacer) }));
