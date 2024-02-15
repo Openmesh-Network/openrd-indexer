@@ -4,9 +4,10 @@ import { Storage } from "..";
 import { IndexedTask } from "../types/tasks";
 import { replacer, reviver } from "../utils/json";
 import { parseBigInt } from "../utils/parseBigInt";
-import { isAddress } from "viem";
-import { normalizeAddress } from "../event-watchers/userHelpers";
+import { isAddress, verifyMessage, verifyTypedData } from "viem";
+import { createUserIfNotExists, normalizeAddress } from "../event-watchers/userHelpers";
 import { ObjectFilter, passesObjectFilter } from "./filter";
+import { fetchMetadata } from "../utils/metadata-fetch";
 
 function malformedRequest(res: Response, error: string): void {
   res.statusCode = 400;
@@ -175,5 +176,29 @@ export function registerRoutes(app: Express, storage: Storage) {
       .reduce((sum, val) => (sum += val), 0);
 
     res.end(JSON.stringify({ totalUsdValue: totalUsdValue }));
+  });
+
+  // Update the metadata of a user
+  app.post(basePath + "setMetadata", async function (req, res) {
+    try {
+      const account = req.body.account;
+      const metadataUri = req.body.metadata;
+      const signature = req.body.signature;
+      const valid = verifyMessage({ address: account, message: `OpenR&D metadata: ${metadataUri}`, signature: signature });
+      if (!valid) {
+        return malformedRequest(res, "signature is not valid");
+      }
+
+      const metadata = await fetchMetadata(metadataUri);
+      await storage.users.update((users) => {
+        const address = normalizeAddress(account);
+        createUserIfNotExists(users, address);
+        users[address].metadata = metadata;
+      });
+      res.end(JSON.stringify({ success: true }));
+    } catch (error: any) {
+      res.statusCode = 500;
+      res.end(JSON.stringify({ error: error?.message ?? JSON.stringify(error) }));
+    }
   });
 }
