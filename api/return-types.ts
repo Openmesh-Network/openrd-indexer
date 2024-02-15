@@ -25,7 +25,3 @@ export interface TotalUsersReturn {
 export interface TotalUsdValueReturn {
   totalUsdValue: number;
 }
-
-export interface TotalTasksWithStateReturn {
-  totalTasksWithState: number;
-}

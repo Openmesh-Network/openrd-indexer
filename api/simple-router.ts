@@ -104,10 +104,10 @@ export function registerRoutes(app: Express, storage: Storage) {
           return passesObjectFilter(task, filter);
         });
 
-      res.end(JSON.stringify({ filterTasks: filterTasks }));
+      res.end(JSON.stringify({ filterTasks: filterTasks }, replacer));
     } catch (error) {
       res.statusCode = 500;
-      res.end(JSON.stringify({ error: JSON.stringify(error) }));
+      res.end(JSON.stringify({ error: JSON.stringify(error, replacer) }));
     }
   });
 
@@ -147,21 +147,5 @@ export function registerRoutes(app: Express, storage: Storage) {
       .reduce((sum, val) => (sum += val), 0);
 
     res.end(JSON.stringify({ totalUsdValue: totalUsdValue }));
-  });
-
-  // Get total task count with a certain state
-  app.get(basePath + "totalTasksWithState/:state", async function (req, res) {
-    const state = parseInt(req.params.state);
-    if (Number.isNaN(state)) {
-      return malformedRequest(res, "state is not a valid number");
-    }
-
-    const tasks = await storage.tasks.get();
-    const totalTasksWithState = Object.values(tasks)
-      .map((chainTasks: { [taskId: string]: IndexedTask }) => Object.values(chainTasks))
-      .flat(1)
-      .filter((task) => task.state === state).length;
-
-    res.end(JSON.stringify({ totalTasksWithState: totalTasksWithState }));
   });
 }
