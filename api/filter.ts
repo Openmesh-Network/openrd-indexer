@@ -57,11 +57,13 @@ export function passesFilter(value: any, filter: Filter): boolean {
 }
 
 export function passesObjectFilter(object: any, objectFilter: ObjectFilter): boolean {
-  Object.keys(objectFilter).forEach((property) => {
+  const properties = Object.keys(objectFilter);
+  for (let i = 0; i < properties.length; i++) {
+    const property = properties[i];
     if (!passesFilter(object[property], objectFilter[property])) {
       return false;
     }
-  });
+  }
 
   return true;
 }
