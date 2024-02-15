@@ -111,6 +111,34 @@ export function registerRoutes(app: Express, storage: Storage) {
     }
   });
 
+  // Get single user events
+  app.get(basePath + "userEvents/:address", async function (req, res) {
+    const address = req.params.address;
+    if (!isAddress(address)) {
+      return malformedRequest(res, "address is not a valid address");
+    }
+
+    const users = await storage.users.get();
+    const tasks = await storage.tasks.get();
+    const user = users[normalizeAddress(address)];
+
+    if (!user) {
+      res.statusCode = 404;
+      return res.end("User not found");
+    }
+
+    const userEvents = Object.keys(tasks)
+      .map((chainId) =>
+        Object.keys(tasks[chainId as any as number]).map((taskId) => {
+          return { chainId: parseInt(chainId), taskId: BigInt(taskId) };
+        })
+      )
+      .flat(1)
+      .flatMap((taskInfo) => tasks[taskInfo.chainId][taskInfo.taskId.toString()].events);
+
+    res.end(JSON.stringify(userEvents, replacer));
+  });
+
   // Get total task count
   app.get(basePath + "totalTasks", async function (_, res) {
     const tasks = await storage.tasks.get();
