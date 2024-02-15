@@ -2,7 +2,7 @@ export interface Filter {
   min?: number | bigint;
   max?: number | bigint;
   equal?: string | number | bigint;
-  contains?: string | any[];
+  contains?: string | any;
   oneOf?: Filter[];
   objectFilter?: ObjectFilter;
 }
