@@ -129,7 +129,7 @@ export function registerRoutes(app: Express, storage: Storage) {
 
     const userEvents = Object.keys(user.tasks)
       .map((chainId) =>
-        Object.keys(tasks[chainId as any as number]).map((taskId) => {
+        Object.keys(user.tasks[chainId as any as number]).map((taskId) => {
           return { chainId: parseInt(chainId), taskId: BigInt(taskId) };
         })
       )
