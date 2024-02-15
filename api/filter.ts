@@ -2,7 +2,7 @@ export interface Filter {
   min?: number | bigint;
   max?: number | bigint;
   equal?: string | number | bigint;
-  contains?: string | any;
+  includes?: string | any;
   oneOf?: Filter[];
   objectFilter?: ObjectFilter;
 }
@@ -39,8 +39,8 @@ export function passesFilter(value: any, filter: Filter): boolean {
       return false;
     }
   }
-  if (filter.contains) {
-    if (!value.contains(filter.contains)) {
+  if (filter.includes) {
+    if (!value.includes(filter.includes)) {
       return false;
     }
   }
