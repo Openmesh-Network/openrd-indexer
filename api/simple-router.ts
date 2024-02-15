@@ -127,7 +127,7 @@ export function registerRoutes(app: Express, storage: Storage) {
       return res.end("User not found");
     }
 
-    const userEvents = Object.keys(tasks)
+    const userEvents = Object.keys(user.tasks)
       .map((chainId) =>
         Object.keys(tasks[chainId as any as number]).map((taskId) => {
           return { chainId: parseInt(chainId), taskId: BigInt(taskId) };
