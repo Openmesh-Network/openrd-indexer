@@ -89,7 +89,7 @@ export function registerRoutes(app: Express, storage: Storage) {
       const filterTasks = Object.keys(tasks)
         .map((chainId) =>
           Object.keys(tasks[chainId as any as number]).map((taskId) => {
-            return { chainId: chainId as any as number, taskId: BigInt(taskId) };
+            return { chainId: parseInt(chainId), taskId: BigInt(taskId) };
           })
         )
         .flat(1)
