@@ -105,9 +105,9 @@ export function registerRoutes(app: Express, storage: Storage) {
         });
 
       res.end(JSON.stringify(filterTasks, replacer));
-    } catch (error) {
+    } catch (error: any) {
       res.statusCode = 500;
-      res.end(JSON.stringify({ error: JSON.stringify(error, replacer) }));
+      res.end(JSON.stringify({ error: error?.message ?? JSON.stringify(error) }));
     }
   });
 
