@@ -3,7 +3,7 @@ import { TasksContract } from "../contracts/Tasks";
 import { CancelTaskRequested } from "../types/task-events";
 import { ContractWatcher } from "../utils/contract-watcher";
 import { fetchMetadata } from "../utils/metadata-fetch";
-import { createCancelTaskRequestIfNotExists } from "./taskHelpers";
+import { addEvent, createCancelTaskRequestIfNotExists } from "./taskHelpers";
 
 export function watchCancelTaskRequested(contractWatcher: ContractWatcher, storage: Storage) {
   contractWatcher.startWatching("CancelTaskRequested", {
@@ -45,7 +45,7 @@ export async function processCancelTaskRequested(event: CancelTaskRequested, sto
     const request = task.cancelTaskRequests[event.requestId];
     request.metadata = event.metadata;
 
-    task.events.push(taskEvent);
+    addEvent(task, taskEvent);
   });
 
   await fetchMetadata(event.metadata)

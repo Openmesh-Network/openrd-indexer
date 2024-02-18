@@ -3,7 +3,7 @@ import { TasksContract } from "../contracts/Tasks";
 import { RequestAccepted } from "../types/task-events";
 import { Request, RequestType } from "../types/tasks";
 import { ContractWatcher } from "../utils/contract-watcher";
-import { createCancelTaskRequestIfNotExists, getRequest } from "./taskHelpers";
+import { addEvent, createCancelTaskRequestIfNotExists, getRequest } from "./taskHelpers";
 
 export function watchRequestAccepted(contractWatcher: ContractWatcher, storage: Storage) {
   contractWatcher.startWatching("RequestAccepted", {
@@ -49,6 +49,6 @@ export async function processRequestAccepted(event: RequestAccepted, storage: St
     }
     request.accepted = true;
 
-    task.events.push(taskEvent);
+    addEvent(task, taskEvent);
   });
 }

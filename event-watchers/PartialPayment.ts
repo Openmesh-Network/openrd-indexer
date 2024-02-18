@@ -2,7 +2,7 @@ import { Storage } from "..";
 import { TasksContract } from "../contracts/Tasks";
 import { PartialPayment } from "../types/task-events";
 import { ContractWatcher } from "../utils/contract-watcher";
-import { createTaskIfNotExists } from "./taskHelpers";
+import { addEvent, createTaskIfNotExists } from "./taskHelpers";
 
 export function watchPartialPayment(contractWatcher: ContractWatcher, storage: Storage) {
   contractWatcher.startWatching("PartialPayment", {
@@ -56,7 +56,7 @@ export async function processPartialPayment(event: PartialPayment, storage: Stor
       task.paidOut[i] += reward;
     });
 
-    task.events.push(taskEvent);
+    addEvent(task, taskEvent);
   });
 
   // Do we also wanna keep track of the usd value of the payout?

@@ -2,7 +2,7 @@ import { Storage } from "..";
 import { TasksContract } from "../contracts/Tasks";
 import { DeadlineChanged } from "../types/task-events";
 import { ContractWatcher } from "../utils/contract-watcher";
-import { createTaskIfNotExists } from "./taskHelpers";
+import { addEvent, createTaskIfNotExists } from "./taskHelpers";
 
 export function watchDeadlineChanged(contractWatcher: ContractWatcher, storage: Storage) {
   contractWatcher.startWatching("DeadlineChanged", {
@@ -43,6 +43,6 @@ export async function processDeadlineChanged(event: DeadlineChanged, storage: St
     const task = tasks[event.chainId][taskId];
     task.deadline = event.newDeadline;
 
-    task.events.push(taskEvent);
+    addEvent(task, taskEvent);
   });
 }

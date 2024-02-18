@@ -2,7 +2,7 @@ import { Storage } from "..";
 import { TasksContract } from "../contracts/Tasks";
 import { ApplicationAccepted } from "../types/task-events";
 import { ContractWatcher } from "../utils/contract-watcher";
-import { createApplicationIfNotExists } from "./taskHelpers";
+import { addEvent, createApplicationIfNotExists } from "./taskHelpers";
 
 export function watchApplicationAccepted(contractWatcher: ContractWatcher, storage: Storage) {
   contractWatcher.startWatching("ApplicationAccepted", {
@@ -44,6 +44,6 @@ export async function processApplicationAccepted(event: ApplicationAccepted, sto
     const application = task.applications[event.applicationId];
     application.accepted = true;
 
-    task.events.push(taskEvent);
+    addEvent(task, taskEvent);
   });
 }

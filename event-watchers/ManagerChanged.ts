@@ -5,7 +5,7 @@ import { TasksContract } from "../contracts/Tasks";
 import { ManagerChanged } from "../types/task-events";
 import { TaskRole } from "../types/user";
 import { ContractWatcher } from "../utils/contract-watcher";
-import { createTaskIfNotExists } from "./taskHelpers";
+import { addEvent, createTaskIfNotExists } from "./taskHelpers";
 import { createUserTaskNetworkIfNotExists, normalizeAddress } from "./userHelpers";
 
 export function watchManagerChanged(contractWatcher: ContractWatcher, storage: Storage) {
@@ -49,7 +49,7 @@ export async function processManagerChanged(event: ManagerChanged, storage: Stor
     oldManager = task.manager;
     task.manager = event.newManager;
 
-    task.events.push(taskEvent);
+    addEvent(task, taskEvent);
   });
 
   await storage.users.update((users) => {

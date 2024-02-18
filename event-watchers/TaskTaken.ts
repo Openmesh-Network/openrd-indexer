@@ -4,7 +4,7 @@ import { TaskTaken } from "../types/task-events";
 import { TaskState } from "../types/tasks";
 import { TaskRole } from "../types/user";
 import { ContractWatcher } from "../utils/contract-watcher";
-import { createApplicationIfNotExists } from "./taskHelpers";
+import { addEvent, createApplicationIfNotExists } from "./taskHelpers";
 import { createUserTaskIfNotExists, normalizeAddress } from "./userHelpers";
 
 export function watchTaskTaken(contractWatcher: ContractWatcher, storage: Storage) {
@@ -47,7 +47,7 @@ export async function processTaskTaken(event: TaskTaken, storage: Storage): Prom
     task.state = TaskState.Taken;
     task.executorApplication = event.applicationId;
 
-    task.events.push(taskEvent);
+    addEvent(task, taskEvent);
   });
 
   const application = await storage.tasks.get().then((task) => task[event.chainId][taskId].applications[event.applicationId]);

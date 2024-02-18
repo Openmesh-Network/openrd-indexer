@@ -3,7 +3,7 @@ import { TasksContract } from "../contracts/Tasks";
 import { SubmissionCreated } from "../types/task-events";
 import { ContractWatcher } from "../utils/contract-watcher";
 import { fetchMetadata } from "../utils/metadata-fetch";
-import { createSubmissionIfNotExists } from "./taskHelpers";
+import { addEvent, createSubmissionIfNotExists } from "./taskHelpers";
 
 export function watchSubmissionCreated(contractWatcher: ContractWatcher, storage: Storage) {
   contractWatcher.startWatching("SubmissionCreated", {
@@ -45,7 +45,7 @@ export async function processSubmissionCreated(event: SubmissionCreated, storage
     const submission = task.submissions[event.submissionId];
     submission.metadata = event.metadata;
 
-    task.events.push(taskEvent);
+    addEvent(task, taskEvent);
   });
 
   await fetchMetadata(event.metadata)

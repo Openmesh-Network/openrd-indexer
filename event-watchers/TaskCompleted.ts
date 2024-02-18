@@ -3,7 +3,7 @@ import { TasksContract } from "../contracts/Tasks";
 import { TaskCompleted } from "../types/task-events";
 import { TaskCompletionSource, TaskState } from "../types/tasks";
 import { ContractWatcher } from "../utils/contract-watcher";
-import { createTaskIfNotExists } from "./taskHelpers";
+import { addEvent, createTaskIfNotExists } from "./taskHelpers";
 
 export function watchTaskCompleted(contractWatcher: ContractWatcher, storage: Storage) {
   contractWatcher.startWatching("TaskCompleted", {
@@ -70,6 +70,6 @@ export async function processTaskCompleted(event: TaskCompleted, storage: Storag
 
     // Doesnt keep track of the budget refunded to the proposer
 
-    task.events.push(taskEvent);
+    addEvent(task, taskEvent);
   });
 }

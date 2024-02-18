@@ -97,6 +97,8 @@ export interface IndexedTask extends Task {
   cancelTaskRequests: { [requestId: number]: IndexedCancelTaskRequest };
 
   completionSource?: TaskCompletionSource;
+  createdAt: number;
+  lastUpdated: number;
   events: number[];
   cachedMetadata: string;
   usdValue: number;

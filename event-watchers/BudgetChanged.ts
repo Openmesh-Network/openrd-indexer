@@ -5,7 +5,7 @@ import { TasksContract } from "../contracts/Tasks";
 import { BudgetChanged } from "../types/task-events";
 import { publicClients } from "../utils/chain-cache";
 import { ContractWatcher } from "../utils/contract-watcher";
-import { createTaskIfNotExists } from "./taskHelpers";
+import { addEvent, createTaskIfNotExists } from "./taskHelpers";
 
 export function watchBudgetChanged(contractWatcher: ContractWatcher, storage: Storage) {
   contractWatcher.startWatching("BudgetChanged", {
@@ -47,7 +47,7 @@ export async function processBudgetChanged(event: BudgetChanged, storage: Storag
     // Budget gets updated in the next statement (as it might fail and we wanna be sure the taskEvent is added)
     // task.budget = ...
 
-    task.events.push(taskEvent);
+    addEvent(task, taskEvent);
   });
 
   await storage.tasks

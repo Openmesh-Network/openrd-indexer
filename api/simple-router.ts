@@ -103,7 +103,11 @@ export function registerRoutes(app: Express, storage: Storage) {
             task.cachedMetadata = JSON.parse(task.cachedMetadata, reviver);
           }
           return passesObjectFilter(task, filter);
-        });
+        })
+        .sort(
+          (taskInfo1, taskInfo2) =>
+            tasks[taskInfo2.chainId][taskInfo2.taskId.toString()].lastUpdated - tasks[taskInfo1.chainId][taskInfo1.taskId.toString()].lastUpdated
+        );
 
       res.end(JSON.stringify(filterTasks, replacer));
     } catch (error: any) {

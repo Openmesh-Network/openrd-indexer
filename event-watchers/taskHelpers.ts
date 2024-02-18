@@ -1,7 +1,7 @@
 import { zeroAddress } from "viem";
 
 import { TasksStorage } from "..";
-import { Request, RequestType, SubmissionJudgement, TaskState } from "../types/tasks";
+import { IndexedTask, Request, RequestType, SubmissionJudgement, TaskState } from "../types/tasks";
 
 export function createNetworkIfNotExists(tasks: TasksStorage, chainId: number) {
   if (!tasks[chainId]) {
@@ -27,6 +27,8 @@ export function createTaskIfNotExists(tasks: TasksStorage, chainId: number, task
       state: TaskState.Open,
       submissions: [],
 
+      createdAt: Math.round(new Date().getTime() / 1000),
+      lastUpdated: Math.round(new Date().getTime() / 1000),
       events: [],
       cachedMetadata: "",
       usdValue: 0,
@@ -86,4 +88,9 @@ export function getRequest(tasks: TasksStorage, chainId: number, taskId: string,
       createCancelTaskRequestIfNotExists(tasks, chainId, taskId, requestId);
       return tasks[chainId][taskId].cancelTaskRequests[requestId].request;
   }
+}
+
+export function addEvent(task: IndexedTask, event: number): void {
+  task.events.push(event);
+  task.lastUpdated = Math.round(new Date().getTime() / 1000);
 }

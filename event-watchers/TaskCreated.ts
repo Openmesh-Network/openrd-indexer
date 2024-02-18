@@ -8,7 +8,7 @@ import { chains, publicClients } from "../utils/chain-cache";
 import { ContractWatcher } from "../utils/contract-watcher";
 import { getPrice } from "../utils/get-token-price";
 import { fetchMetadata } from "../utils/metadata-fetch";
-import { createTaskIfNotExists } from "./taskHelpers";
+import { addEvent, createTaskIfNotExists } from "./taskHelpers";
 import { createUserTaskIfNotExists, normalizeAddress } from "./userHelpers";
 
 export function watchTaskCreated(contractWatcher: ContractWatcher, storage: Storage) {
@@ -57,7 +57,7 @@ export async function processTaskCreated(event: TaskCreated, storage: Storage): 
     task.budget = [...event.budget];
     task.escrow = event.escrow;
 
-    task.events.push(taskEvent);
+    addEvent(task, taskEvent);
   });
 
   await storage.users.update((users) => {

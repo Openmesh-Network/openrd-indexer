@@ -3,7 +3,7 @@ import { TasksContract } from "../contracts/Tasks";
 import { SubmissionReviewed } from "../types/task-events";
 import { ContractWatcher } from "../utils/contract-watcher";
 import { fetchMetadata } from "../utils/metadata-fetch";
-import { createSubmissionIfNotExists } from "./taskHelpers";
+import { addEvent, createSubmissionIfNotExists } from "./taskHelpers";
 
 export function watchSubmissionReviewed(contractWatcher: ContractWatcher, storage: Storage) {
   contractWatcher.startWatching("SubmissionReviewed", {
@@ -46,7 +46,7 @@ export async function processSubmissionReviewed(event: SubmissionReviewed, stora
     submission.judgement = event.judgement;
     submission.feedback = event.feedback;
 
-    task.events.push(taskEvent);
+    addEvent(task, taskEvent);
   });
 
   await fetchMetadata(event.feedback)

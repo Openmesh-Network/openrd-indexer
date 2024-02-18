@@ -3,7 +3,7 @@ import { TasksContract } from "../contracts/Tasks";
 import { TaskCancelled } from "../types/task-events";
 import { TaskState } from "../types/tasks";
 import { ContractWatcher } from "../utils/contract-watcher";
-import { createTaskIfNotExists } from "./taskHelpers";
+import { addEvent, createTaskIfNotExists } from "./taskHelpers";
 
 export function watchTaskCancelled(contractWatcher: ContractWatcher, storage: Storage) {
   contractWatcher.startWatching("TaskCancelled", {
@@ -45,6 +45,6 @@ export async function processTaskCancelled(event: TaskCancelled, storage: Storag
     task.state = TaskState.Closed;
     // Closed with no source means cancelled
 
-    task.events.push(taskEvent);
+    addEvent(task, taskEvent);
   });
 }

@@ -3,7 +3,7 @@ import { TasksContract } from "../contracts/Tasks";
 import { MetadataChanged } from "../types/task-events";
 import { ContractWatcher } from "../utils/contract-watcher";
 import { fetchMetadata } from "../utils/metadata-fetch";
-import { createTaskIfNotExists } from "./taskHelpers";
+import { addEvent, createTaskIfNotExists } from "./taskHelpers";
 
 export function watchMetadataChanged(contractWatcher: ContractWatcher, storage: Storage) {
   contractWatcher.startWatching("MetadataChanged", {
@@ -44,7 +44,7 @@ export async function processMetadataChanged(event: MetadataChanged, storage: St
     const task = tasks[event.chainId][taskId];
     task.metadata = event.newMetadata;
 
-    task.events.push(taskEvent);
+    addEvent(task, taskEvent);
   });
 
   await fetchMetadata(event.newMetadata)

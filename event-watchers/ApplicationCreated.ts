@@ -4,7 +4,7 @@ import { ApplicationCreated } from "../types/task-events";
 import { TaskRole } from "../types/user";
 import { ContractWatcher } from "../utils/contract-watcher";
 import { fetchMetadata } from "../utils/metadata-fetch";
-import { createApplicationIfNotExists } from "./taskHelpers";
+import { addEvent, createApplicationIfNotExists } from "./taskHelpers";
 import { createUserTaskIfNotExists, normalizeAddress } from "./userHelpers";
 
 export function watchApplicationCreated(contractWatcher: ContractWatcher, storage: Storage) {
@@ -50,7 +50,7 @@ export async function proccessApplicationCreated(event: ApplicationCreated, stor
     application.nativeReward = [...event.nativeReward];
     application.reward = [...event.reward];
 
-    task.events.push(taskEvent);
+    addEvent(task, taskEvent);
   });
 
   await storage.users.update((users) => {
