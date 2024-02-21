@@ -1,5 +1,5 @@
 import axios from "axios";
-import { Chain, createPublicClient, formatUnits, http, parseAbiItem } from "viem";
+import { Chain, formatUnits, parseAbiItem } from "viem";
 
 import { ERC20Transfer } from "../types/tasks";
 import { publicClients } from "./chain-cache";

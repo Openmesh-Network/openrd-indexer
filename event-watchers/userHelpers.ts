@@ -11,6 +11,7 @@ export function createUserIfNotExists(users: UsersStorage, userAddress: Address)
 
     // Smart logic to retrieve metadata based on Address (which should also be callable through the API by the user to refresh)
     // Query Aragon Subgraph ? (DAO metadata)
+    // Complicated as smart contracts are not crosschain like EOA
   }
 }
 

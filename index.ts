@@ -26,6 +26,7 @@ import { IndexedTask } from "./types/tasks";
 import { User } from "./types/user";
 import { MultischainWatcher } from "./utils/multichain-watcher";
 import { PersistentJson } from "./utils/persistent-json";
+import { watchRewardIncreased } from "./event-watchers/RewardIncreased";
 
 export interface TasksStorage {
   [chainId: number]: {
@@ -92,6 +93,7 @@ async function start() {
 
     watchDeadlineChanged(contractWatcher, storage);
     watchBudgetChanged(contractWatcher, storage);
+    watchRewardIncreased(contractWatcher, storage);
     watchMetadataChanged(contractWatcher, storage);
     watchManagerChanged(contractWatcher, storage);
     watchPartialPayment(contractWatcher, storage);
