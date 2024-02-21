@@ -41,12 +41,19 @@ export async function processPartialPayment(event: PartialPayment, storage: Stor
   await storage.tasks.update((tasks) => {
     createTaskIfNotExists(tasks, event.chainId, taskId);
     const task = tasks[event.chainId][taskId];
+    const executorApplication = task.applications[task.executorApplication];
+    if (!executorApplication) {
+      console.warn(`Executor application undefined for partial payment ${event.chainId}:${event.taskId}`);
+    }
     event.partialNativeReward.forEach((nativeReward, i) => {
       if (!task.nativePaidOut[i]) {
         task.nativePaidOut[i] = BigInt(0);
       }
 
       task.nativePaidOut[i] += nativeReward;
+      if (executorApplication) {
+        executorApplication.nativeReward[i].amount -= nativeReward;
+      }
     });
     event.partialReward.forEach((reward, i) => {
       if (!task.paidOut[i]) {
@@ -54,6 +61,9 @@ export async function processPartialPayment(event: PartialPayment, storage: Stor
       }
 
       task.paidOut[i] += reward;
+      if (executorApplication) {
+        executorApplication.reward[i].amount -= reward;
+      }
     });
 
     addEvent(task, taskEvent);

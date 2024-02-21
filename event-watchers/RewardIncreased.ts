@@ -42,11 +42,11 @@ export async function proccessRewardIncreased(event: RewardIncreased, storage: S
     createApplicationIfNotExists(tasks, event.chainId, taskId, event.applicationId);
     const task = tasks[event.chainId][taskId];
     const application = task.applications[event.applicationId];
-    application.nativeReward.map((nativeReward, i) => {
-      return { ...nativeReward, amount: nativeReward.amount + event.nativeIncrease[i] };
+    application.nativeReward.forEach((nativeReward, i) => {
+      nativeReward.amount += event.nativeIncrease[i];
     });
-    application.reward.map((reward, i) => {
-      return { ...reward, amount: reward.amount + event.increase[i] };
+    application.reward.forEach((reward, i) => {
+      reward.amount += event.increase[i];
     });
 
     addEvent(task, taskEvent);
