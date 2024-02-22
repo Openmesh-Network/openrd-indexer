@@ -3,7 +3,7 @@ import { zeroAddress } from "viem";
 import { TasksStorage } from "..";
 import { IndexedTask, Request, RequestType, SubmissionJudgement, TaskState } from "../types/tasks";
 
-export function createNetworkIfNotExists(tasks: TasksStorage, chainId: number) {
+export function createNetworkIfNotExists(tasks: TasksStorage, chainId: number): void {
   if (!tasks[chainId]) {
     tasks[chainId] = {};
   }

@@ -205,4 +205,58 @@ export function registerRoutes(app: Express, storage: Storage) {
       res.end(JSON.stringify({ error: error?.message ?? JSON.stringify(error) }));
     }
   });
+
+  // Get disputes of single task
+  app.get(basePath + "disputes/:chainId/:taskId", async function (req, res) {
+    const chainId = parseInt(req.params.chainId);
+    if (Number.isNaN(chainId)) {
+      return malformedRequest(res, "chainId is not a valid number");
+    }
+
+    const taskId = parseBigInt(req.params.taskId);
+    if (taskId === undefined) {
+      return malformedRequest(res, "taskId is not a valid bigint");
+    }
+
+    const disputes = await storage.disputes.get();
+    if (!disputes[chainId]) {
+      res.statusCode = 404;
+      return res.end("Chain not found");
+    }
+
+    const taskDisputes = disputes[chainId][taskId.toString()];
+    if (!taskDisputes) {
+      res.statusCode = 404;
+      return res.end("Task disputes not found");
+    }
+
+    res.end(JSON.stringify(taskDisputes, replacer));
+  });
+
+  // Get drafts of single dao
+  app.get(basePath + "drafts/:chainId/:dao", async function (req, res) {
+    const chainId = parseInt(req.params.chainId);
+    if (Number.isNaN(chainId)) {
+      return malformedRequest(res, "chainId is not a valid number");
+    }
+
+    const dao = req.params.dao;
+    if (!isAddress(dao)) {
+      return malformedRequest(res, "dao is not a valid address");
+    }
+
+    const drafts = await storage.drafts.get();
+    if (!drafts[chainId]) {
+      res.statusCode = 404;
+      return res.end("Chain not found");
+    }
+
+    const taskDrafts = drafts[chainId][normalizeAddress(dao)];
+    if (!taskDrafts) {
+      res.statusCode = 404;
+      return res.end("Task drafts not found");
+    }
+
+    res.end(JSON.stringify(taskDrafts, replacer));
+  });
 }

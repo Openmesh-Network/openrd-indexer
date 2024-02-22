@@ -110,3 +110,27 @@ export enum TaskCompletionSource {
   SubmissionAccepted,
   Dispute,
 }
+
+export interface Dispute {
+  partialNativeReward: bigint[];
+  partialReward: bigint[];
+  governancePlugin: Address;
+  proposalId: bigint;
+}
+
+export interface Draft {
+  metadata: string;
+  deadline: bigint;
+  manager: Address;
+  disputeManager: Address;
+  nativeBudget: bigint;
+  budget: ERC20Transfer[];
+  preapproved: PreapprovedApplication[];
+
+  governancePlugin: Address;
+  proposalId: bigint;
+}
+
+export interface IndexedDraft extends Draft {
+  cachedMetadata: string;
+}

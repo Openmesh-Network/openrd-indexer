@@ -1,5 +1,5 @@
 import { TaskEvent } from "../types/task-events";
-import { IndexedTask } from "../types/tasks";
+import { Dispute, IndexedDraft, IndexedTask } from "../types/tasks";
 import { User } from "../types/user";
 
 export type TaskReturn = IndexedTask;
@@ -27,3 +27,7 @@ export interface TotalUsersReturn {
 export interface TotalUsdValueReturn {
   totalUsdValue: number;
 }
+
+export type DisputesReturn = Dispute[];
+
+export type DraftsReturn = IndexedDraft[];

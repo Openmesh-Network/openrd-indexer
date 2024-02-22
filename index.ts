@@ -22,11 +22,12 @@ import { watchTaskCompleted } from "./event-watchers/TaskCompleted";
 import { watchTaskCreated } from "./event-watchers/TaskCreated";
 import { watchTaskTaken } from "./event-watchers/TaskTaken";
 import { TaskEvent } from "./types/task-events";
-import { IndexedTask } from "./types/tasks";
+import { Dispute, IndexedDraft, IndexedTask } from "./types/tasks";
 import { User } from "./types/user";
 import { MultischainWatcher } from "./utils/multichain-watcher";
 import { PersistentJson } from "./utils/persistent-json";
 import { watchRewardIncreased } from "./event-watchers/RewardIncreased";
+import { watchDisputeCreated } from "./event-watchers/extensions/DisputeCreated";
 
 export interface TasksStorage {
   [chainId: number]: {
@@ -37,10 +38,25 @@ export type TasksEventsStorage = TaskEvent[];
 export interface UsersStorage {
   [address: Address]: User;
 }
+
+export interface DisputesStorage {
+  [chainId: number]: {
+    [taskId: string]: Dispute[];
+  };
+}
+export interface DraftsStorage {
+  [chainId: number]: {
+    [dao: Address]: IndexedDraft[];
+  };
+}
+
 export interface Storage {
   tasks: PersistentJson<TasksStorage>;
   tasksEvents: PersistentJson<TasksEventsStorage>;
   users: PersistentJson<UsersStorage>;
+
+  disputes: PersistentJson<DisputesStorage>;
+  drafts: PersistentJson<DraftsStorage>;
 }
 
 async function start() {
@@ -75,6 +91,9 @@ async function start() {
     tasks: new PersistentJson<TasksStorage>("tasks", {}),
     tasksEvents: new PersistentJson<TasksEventsStorage>("tasksEvents", []),
     users: new PersistentJson<UsersStorage>("users", {}),
+
+    disputes: new PersistentJson<DisputesStorage>("disputes", {}),
+    drafts: new PersistentJson<DraftsStorage>("drafts", {}),
   };
 
   multichainWatcher.forEach((contractWatcher) => {
@@ -97,6 +116,8 @@ async function start() {
     watchMetadataChanged(contractWatcher, storage);
     watchManagerChanged(contractWatcher, storage);
     watchPartialPayment(contractWatcher, storage);
+
+    watchDisputeCreated(contractWatcher, storage);
   });
 
   process.on("SIGINT", function () {
