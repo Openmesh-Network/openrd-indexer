@@ -65,5 +65,5 @@ export async function proccessApplicationCreated(event: ApplicationCreated, stor
         tasks[event.chainId][taskId].applications[event.applicationId].cachedMetadata = metadata;
       })
     )
-    .catch((err) => console.error(`Error while fetching application metadata ${event.metadata} (${event.chainId}-${taskId}): ${JSON.stringify(err)}`));
+    .catch((err) => console.error(`Error while fetching application metadata ${event.metadata} (${event.chainId}-${taskId}): ${err}`));
 }

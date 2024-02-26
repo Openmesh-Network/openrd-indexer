@@ -82,12 +82,12 @@ export async function processTaskCreated(event: TaskCreated, storage: Storage): 
           tasks[event.chainId][taskId].cachedMetadata = metadata;
         })
       )
-      .catch((err) => console.error(`Error while fetching task metadata ${event.metadata} (${event.chainId}-${taskId}): ${JSON.stringify(err)}`)),
+      .catch((err) => console.error(`Error while fetching task metadata ${event.metadata} (${event.chainId}-${taskId}): ${err}`)),
 
     // Get USD value of budget + nativeBudget (paid, not received, although for most coins this is identical)
     getPrice(chains[event.chainId], event.nativeBudget, [...event.budget])
       .then((usdValue) => storage.tasks.update((tasks) => (tasks[event.chainId][taskId].usdValue = usdValue)))
-      .catch((err) => console.error(`Error while fetching usd value of ${event.chainId}-${taskId}: ${JSON.stringify(err)}`)),
+      .catch((err) => console.error(`Error while fetching usd value of ${event.chainId}-${taskId}: ${err}`)),
 
     // Check the escrow ERC20 contents onchain (as there might be a transfer fee)
     Promise.all(
@@ -105,6 +105,6 @@ export async function processTaskCreated(event: TaskCreated, storage: Storage): 
       })
     )
       .then((onchainBudget) => storage.tasks.update((tasks) => (tasks[event.chainId][taskId].budget = onchainBudget)))
-      .catch((err) => console.error(`Error while fetching budget of ${event.chainId}-${taskId}: ${JSON.stringify(err)}`)),
+      .catch((err) => console.error(`Error while fetching budget of ${event.chainId}-${taskId}: ${err}`)),
   ]);
 }

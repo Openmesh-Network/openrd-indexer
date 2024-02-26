@@ -3,6 +3,7 @@ import { Chain, formatUnits, parseAbiItem } from "viem";
 
 import { ERC20Transfer } from "../types/tasks";
 import { publicClients } from "./chain-cache";
+import { normalizeAddress } from "../event-watchers/userHelpers";
 
 export async function getPrice(chain: Chain, nativeBudget: bigint, budget: ERC20Transfer[]): Promise<number> {
   // Example native MATIC: https://api.coingecko.com/api/v3/simple/price?ids=matic-network&vs_currencies=usd
@@ -15,19 +16,20 @@ export async function getPrice(chain: Chain, nativeBudget: bigint, budget: ERC20
   if (nativeBudget > BigInt(0)) {
     const coinId = getCoinOfChain(chain.id);
     const response = await axios.get(`https://api.coingecko.com/api/v3/simple/price?ids=${coinId}&vs_currencies=usd`);
-    const nativePrice = parseInt(response.data[coinId].usd);
+    const nativePrice = parseFloat(response.data[coinId].usd);
     if (Number.isNaN(nativePrice)) {
       console.warn(`Getting price for ${coinId} returned Nan: ${JSON.stringify(response.data)}`);
     } else {
       const nativeAmount = formatUnits(nativeBudget, chain.nativeCurrency.decimals);
-      total += nativePrice * parseInt(nativeAmount);
+      total += nativePrice * parseFloat(nativeAmount);
     }
   }
 
   if (budget.length > 0) {
-    const tokens = budget.map((erc20) => erc20.tokenContract).join(",");
+    const tokens = budget.map((erc20) => normalizeAddress(erc20.tokenContract)).join(",");
     const tokenId = getTokenIdOfChain(chain.id);
     const response = await axios.get(`https://api.coingecko.com/api/v3/simple/token_price/${tokenId}?contract_addresses=${tokens}&vs_currencies=usd`);
+    console.log(response.data);
     await Promise.all(
       budget.map(async (erc20) => {
         try {
@@ -36,15 +38,15 @@ export async function getPrice(chain: Chain, nativeBudget: bigint, budget: ERC20
             address: erc20.tokenContract,
             functionName: "decimals",
           });
-          const tokenPrice = parseInt(response.data[erc20.tokenContract].usd);
+          const tokenPrice = parseFloat(response.data[normalizeAddress(erc20.tokenContract)].usd);
           if (Number.isNaN(tokenPrice)) {
             console.warn(`Getting price for ${tokenId}-${erc20.tokenContract} returned Nan: ${JSON.stringify(response.data)}`);
           } else {
             const tokenAmount = formatUnits(erc20.amount, decimals);
-            total += tokenPrice * parseInt(tokenAmount);
+            total += tokenPrice * parseFloat(tokenAmount);
           }
         } catch (err) {
-          console.log(`Error getting token decimals ${tokenId}-${erc20.tokenContract}: ${JSON.stringify(err)}`);
+          console.log(`Error getting token decimals ${tokenId}-${erc20.tokenContract}: ${err}`);
         }
       })
     );

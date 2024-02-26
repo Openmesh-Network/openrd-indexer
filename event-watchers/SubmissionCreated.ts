@@ -54,5 +54,5 @@ export async function processSubmissionCreated(event: SubmissionCreated, storage
         tasks[event.chainId][taskId].submissions[event.submissionId].cachedMetadata = metadata;
       })
     )
-    .catch((err) => console.error(`Error while fetching submission metadata ${event.metadata} (${event.chainId}-${taskId}): ${JSON.stringify(err)}`));
+    .catch((err) => console.error(`Error while fetching submission metadata ${event.metadata} (${event.chainId}-${taskId}): ${err}`));
 }

@@ -66,7 +66,5 @@ export async function proccessDraftCreated(event: DraftCreated, storage: Storage
         drafts[event.chainId][dao][draftIndex].cachedMetadata = metadata;
       })
     )
-    .catch((err) =>
-      console.error(`Error while fetching draft metadata ${event.info.metadata} (${event.chainId}-${event.dao}-${draftIndex}): ${JSON.stringify(err)}`)
-    );
+    .catch((err) => console.error(`Error while fetching draft metadata ${event.info.metadata} (${event.chainId}-${event.dao}-${draftIndex}): ${err}`));
 }

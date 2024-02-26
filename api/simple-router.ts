@@ -4,7 +4,7 @@ import { Storage } from "..";
 import { IndexedTask } from "../types/tasks";
 import { replacer, reviver } from "../utils/json";
 import { parseBigInt } from "../utils/parseBigInt";
-import { isAddress, verifyMessage, verifyTypedData } from "viem";
+import { isAddress, verifyMessage } from "viem";
 import { createUserIfNotExists, normalizeAddress } from "../event-watchers/userHelpers";
 import { ObjectFilter, passesObjectFilter } from "./filter";
 import { fetchMetadata } from "../utils/metadata-fetch";
@@ -112,7 +112,7 @@ export function registerRoutes(app: Express, storage: Storage) {
       res.end(JSON.stringify(filterTasks, replacer));
     } catch (error: any) {
       res.statusCode = 500;
-      res.end(JSON.stringify({ error: error?.message ?? JSON.stringify(error) }));
+      res.end(JSON.stringify({ error: error?.message ?? "Unknown error" }));
     }
   });
 
@@ -202,7 +202,7 @@ export function registerRoutes(app: Express, storage: Storage) {
       res.end(JSON.stringify({ success: true }));
     } catch (error: any) {
       res.statusCode = 500;
-      res.end(JSON.stringify({ error: error?.message ?? JSON.stringify(error) }));
+      res.end(JSON.stringify({ error: error?.message ?? "Unknown error" }));
     }
   });
 

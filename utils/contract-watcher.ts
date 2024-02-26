@@ -63,7 +63,7 @@ export class ContractWatcher {
         this.watching[watchId].stop = this.client.watchContractEvent({
           ...parameters,
           onError: (err) => {
-            console.error(`Watching ${watchId} error: ${err?.message ?? JSON.stringify(err)}`);
+            console.error(`Watching ${watchId} error: ${err}`);
             this.watching[watchId].stop();
             this.watching[watchId].start();
           },

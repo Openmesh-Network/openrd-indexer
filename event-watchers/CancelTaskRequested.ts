@@ -54,5 +54,5 @@ export async function processCancelTaskRequested(event: CancelTaskRequested, sto
         tasks[event.chainId][taskId].cancelTaskRequests[event.requestId].cachedMetadata = metadata;
       })
     )
-    .catch((err) => console.error(`Error while fetching metadata ${event.metadata} (${event.chainId}-${taskId}): ${JSON.stringify(err)}`));
+    .catch((err) => console.error(`Error while fetching metadata ${event.metadata} (${event.chainId}-${taskId}): ${err}`));
 }

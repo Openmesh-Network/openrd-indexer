@@ -70,7 +70,7 @@ export async function processBudgetChanged(event: BudgetChanged, storage: Storag
       );
     })
     .then((onchainBudget) => storage.tasks.update((tasks) => (tasks[event.chainId][taskId].budget = onchainBudget)))
-    .catch((err) => console.error(`Error while fetching changed budget of ${event.chainId}-${taskId}: ${JSON.stringify(err)}`));
+    .catch((err) => console.error(`Error while fetching changed budget of ${event.chainId}-${taskId}: ${err}`));
 
   // Somehow update usdValue too?
 }

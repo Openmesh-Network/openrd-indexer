@@ -53,5 +53,5 @@ export async function processMetadataChanged(event: MetadataChanged, storage: St
         tasks[event.chainId][taskId].cachedMetadata = metadata;
       })
     )
-    .catch((err) => console.error(`Error while fetching task new metadata ${event.newMetadata} (${event.chainId}-${taskId}): ${JSON.stringify(err)}`));
+    .catch((err) => console.error(`Error while fetching task new metadata ${event.newMetadata} (${event.chainId}-${taskId}): ${err}`));
 }
