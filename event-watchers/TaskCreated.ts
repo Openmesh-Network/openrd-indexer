@@ -1,15 +1,15 @@
 import { parseAbiItem } from "viem";
 
 import { Storage } from "..";
-import { TasksContract } from "../contracts/Tasks";
-import { TaskCreated } from "../types/task-events";
-import { TaskRole } from "../types/user";
-import { chains, publicClients } from "../utils/chain-cache";
-import { ContractWatcher } from "../utils/contract-watcher";
-import { getPrice } from "../utils/get-token-price";
-import { fetchMetadata } from "../utils/metadata-fetch";
-import { addEvent, createTaskIfNotExists } from "./taskHelpers";
-import { createUserTaskIfNotExists, normalizeAddress } from "./userHelpers";
+import { TasksContract } from "../contracts/Tasks.js";
+import { TaskCreated } from "../types/task-events.js";
+import { TaskRole } from "../types/user.js";
+import { chains, publicClients } from "../utils/chain-cache.js";
+import { ContractWatcher } from "../utils/contract-watcher.js";
+import { getPrice } from "../utils/get-token-price.js";
+import { fetchMetadata } from "../utils/metadata-fetch.js";
+import { addEvent, createTaskIfNotExists } from "./taskHelpers.js";
+import { createUserTaskIfNotExists, normalizeAddress } from "./userHelpers.js";
 
 export function watchTaskCreated(contractWatcher: ContractWatcher, storage: Storage) {
   contractWatcher.startWatching("TaskCreated", {

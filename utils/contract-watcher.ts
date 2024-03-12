@@ -1,6 +1,6 @@
 import { Abi, Chain, ContractEventName, createPublicClient, PublicClient, WatchContractEventParameters, webSocket } from "viem";
 
-import { chains, publicClients } from "./chain-cache";
+import { chains, publicClients } from "./chain-cache.js";
 
 export class ContractWatcher {
   public chain: Chain;

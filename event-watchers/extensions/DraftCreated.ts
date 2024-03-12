@@ -1,10 +1,10 @@
 import { Storage } from "../..";
-import { TasksDraftsContract } from "../../contracts/TasksDrafts";
-import { DraftCreated } from "../../types/task-events";
-import { ContractWatcher } from "../../utils/contract-watcher";
-import { fetchMetadata } from "../../utils/metadata-fetch";
-import { normalizeAddress } from "../userHelpers";
-import { createDraftDAOIfNotExists } from "./draftHelpers";
+import { TasksDraftsContract } from "../../contracts/TasksDrafts.js";
+import { DraftCreated } from "../../types/task-events.js";
+import { ContractWatcher } from "../../utils/contract-watcher.js";
+import { fetchMetadata } from "../../utils/metadata-fetch.js";
+import { normalizeAddress } from "../userHelpers.js";
+import { createDraftDAOIfNotExists } from "./draftHelpers.js";
 
 export function watchDraftCreated(contractWatcher: ContractWatcher, storage: Storage) {
   contractWatcher.startWatching("DraftCreated", {

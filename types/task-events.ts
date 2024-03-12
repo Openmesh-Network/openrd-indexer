@@ -1,6 +1,6 @@
 import { Address } from "viem";
 
-import { ERC20Transfer, NativeReward, PreapprovedApplication, RequestType, Reward, SubmissionJudgement, TaskCompletionSource } from "./tasks";
+import { ERC20Transfer, NativeReward, PreapprovedApplication, RequestType, Reward, SubmissionJudgement, TaskCompletionSource } from "./tasks.js";
 
 export interface TaskEventBase {
   blockNumber: bigint;

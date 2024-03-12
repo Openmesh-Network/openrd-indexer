@@ -1,11 +1,11 @@
 import { parseAbiItem } from "viem";
 
 import { Storage } from "..";
-import { TasksContract } from "../contracts/Tasks";
-import { BudgetChanged } from "../types/task-events";
-import { publicClients } from "../utils/chain-cache";
-import { ContractWatcher } from "../utils/contract-watcher";
-import { addEvent, createTaskIfNotExists } from "./taskHelpers";
+import { TasksContract } from "../contracts/Tasks.js";
+import { BudgetChanged } from "../types/task-events.js";
+import { publicClients } from "../utils/chain-cache.js";
+import { ContractWatcher } from "../utils/contract-watcher.js";
+import { addEvent, createTaskIfNotExists } from "./taskHelpers.js";
 
 export function watchBudgetChanged(contractWatcher: ContractWatcher, storage: Storage) {
   contractWatcher.startWatching("BudgetChanged", {

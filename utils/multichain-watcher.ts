@@ -1,6 +1,6 @@
 import { Chain } from "viem";
 
-import { ContractWatcher } from "./contract-watcher";
+import { ContractWatcher } from "./contract-watcher.js";
 
 export interface ChainWatchInfo {
   chain: Chain;

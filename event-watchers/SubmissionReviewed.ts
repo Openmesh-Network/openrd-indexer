@@ -1,9 +1,9 @@
 import { Storage } from "..";
-import { TasksContract } from "../contracts/Tasks";
-import { SubmissionReviewed } from "../types/task-events";
-import { ContractWatcher } from "../utils/contract-watcher";
-import { fetchMetadata } from "../utils/metadata-fetch";
-import { addEvent, createSubmissionIfNotExists } from "./taskHelpers";
+import { TasksContract } from "../contracts/Tasks.js";
+import { SubmissionReviewed } from "../types/task-events.js";
+import { ContractWatcher } from "../utils/contract-watcher.js";
+import { fetchMetadata } from "../utils/metadata-fetch.js";
+import { addEvent, createSubmissionIfNotExists } from "./taskHelpers.js";
 
 export function watchSubmissionReviewed(contractWatcher: ContractWatcher, storage: Storage) {
   contractWatcher.startWatching("SubmissionReviewed", {

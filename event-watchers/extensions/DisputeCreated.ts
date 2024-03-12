@@ -1,9 +1,9 @@
 import { Storage } from "../..";
-import { TasksDisputesContract } from "../../contracts/TasksDisputes";
-import { DisputeCreated } from "../../types/task-events";
-import { ContractWatcher } from "../../utils/contract-watcher";
-import { addEvent, createTaskIfNotExists } from "../taskHelpers";
-import { createDisputeTaskIfNotExists } from "./disputeHelpers";
+import { TasksDisputesContract } from "../../contracts/TasksDisputes.js";
+import { DisputeCreated } from "../../types/task-events.js";
+import { ContractWatcher } from "../../utils/contract-watcher.js";
+import { addEvent, createTaskIfNotExists } from "../taskHelpers.js";
+import { createDisputeTaskIfNotExists } from "./disputeHelpers.js";
 
 export function watchDisputeCreated(contractWatcher: ContractWatcher, storage: Storage) {
   contractWatcher.startWatching("DisputeCreated", {

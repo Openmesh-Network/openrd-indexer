@@ -1,8 +1,8 @@
 import { Storage } from "..";
-import { TasksContract } from "../contracts/Tasks";
-import { RewardIncreased } from "../types/task-events";
-import { ContractWatcher } from "../utils/contract-watcher";
-import { addEvent, createApplicationIfNotExists } from "./taskHelpers";
+import { TasksContract } from "../contracts/Tasks.js";
+import { RewardIncreased } from "../types/task-events.js";
+import { ContractWatcher } from "../utils/contract-watcher.js";
+import { addEvent, createApplicationIfNotExists } from "./taskHelpers.js";
 
 export function watchRewardIncreased(contractWatcher: ContractWatcher, storage: Storage) {
   contractWatcher.startWatching("RewardIncreased", {

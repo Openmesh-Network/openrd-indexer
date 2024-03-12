@@ -1,9 +1,9 @@
 import { Storage } from "..";
-import { TasksContract } from "../contracts/Tasks";
-import { MetadataChanged } from "../types/task-events";
-import { ContractWatcher } from "../utils/contract-watcher";
-import { fetchMetadata } from "../utils/metadata-fetch";
-import { addEvent, createTaskIfNotExists } from "./taskHelpers";
+import { TasksContract } from "../contracts/Tasks.js";
+import { MetadataChanged } from "../types/task-events.js";
+import { ContractWatcher } from "../utils/contract-watcher.js";
+import { fetchMetadata } from "../utils/metadata-fetch.js";
+import { addEvent, createTaskIfNotExists } from "./taskHelpers.js";
 
 export function watchMetadataChanged(contractWatcher: ContractWatcher, storage: Storage) {
   contractWatcher.startWatching("MetadataChanged", {

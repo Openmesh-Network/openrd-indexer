@@ -1,9 +1,8 @@
 import { Storage } from "..";
-import { TasksContract } from "../contracts/Tasks";
-import { RequestAccepted } from "../types/task-events";
-import { Request, RequestType } from "../types/tasks";
-import { ContractWatcher } from "../utils/contract-watcher";
-import { addEvent, createCancelTaskRequestIfNotExists, getRequest } from "./taskHelpers";
+import { TasksContract } from "../contracts/Tasks.js";
+import { RequestAccepted } from "../types/task-events.js";
+import { ContractWatcher } from "../utils/contract-watcher.js";
+import { addEvent, getRequest } from "./taskHelpers.js";
 
 export function watchRequestAccepted(contractWatcher: ContractWatcher, storage: Storage) {
   contractWatcher.startWatching("RequestAccepted", {

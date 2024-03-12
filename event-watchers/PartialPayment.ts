@@ -1,8 +1,8 @@
 import { Storage } from "..";
-import { TasksContract } from "../contracts/Tasks";
-import { PartialPayment } from "../types/task-events";
-import { ContractWatcher } from "../utils/contract-watcher";
-import { addEvent, createTaskIfNotExists } from "./taskHelpers";
+import { TasksContract } from "../contracts/Tasks.js";
+import { PartialPayment } from "../types/task-events.js";
+import { ContractWatcher } from "../utils/contract-watcher.js";
+import { addEvent, createTaskIfNotExists } from "./taskHelpers.js";
 
 export function watchPartialPayment(contractWatcher: ContractWatcher, storage: Storage) {
   contractWatcher.startWatching("PartialPayment", {

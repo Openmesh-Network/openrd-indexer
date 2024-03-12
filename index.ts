@@ -4,30 +4,30 @@ import storageManager from "node-persist";
 import { Address } from "viem";
 import { mainnet, polygon, polygonMumbai, sepolia } from "viem/chains";
 
-import { registerRoutes } from "./api/simple-router";
-import { watchApplicationAccepted } from "./event-watchers/ApplicationAccepted";
-import { watchApplicationCreated } from "./event-watchers/ApplicationCreated";
-import { watchBudgetChanged } from "./event-watchers/BudgetChanged";
-import { watchCancelTaskRequested } from "./event-watchers/CancelTaskRequested";
-import { watchDeadlineChanged } from "./event-watchers/DeadlineChanged";
-import { watchManagerChanged } from "./event-watchers/ManagerChanged";
-import { watchMetadataChanged } from "./event-watchers/MetadataChanged";
-import { watchPartialPayment } from "./event-watchers/PartialPayment";
-import { watchRequestAccepted } from "./event-watchers/RequestAccepted";
-import { watchRequestExecuted } from "./event-watchers/RequestExecuted";
-import { watchSubmissionCreated } from "./event-watchers/SubmissionCreated";
-import { watchSubmissionReviewed } from "./event-watchers/SubmissionReviewed";
-import { watchTaskCancelled } from "./event-watchers/TaskCancelled";
-import { watchTaskCompleted } from "./event-watchers/TaskCompleted";
-import { watchTaskCreated } from "./event-watchers/TaskCreated";
-import { watchTaskTaken } from "./event-watchers/TaskTaken";
-import { TaskEvent } from "./types/task-events";
-import { Dispute, IndexedDraft, IndexedTask } from "./types/tasks";
-import { User } from "./types/user";
-import { MultischainWatcher } from "./utils/multichain-watcher";
-import { PersistentJson } from "./utils/persistent-json";
-import { watchRewardIncreased } from "./event-watchers/RewardIncreased";
-import { watchDisputeCreated } from "./event-watchers/extensions/DisputeCreated";
+import { registerRoutes } from "./api/simple-router.js";
+import { watchApplicationAccepted } from "./event-watchers/ApplicationAccepted.js";
+import { watchApplicationCreated } from "./event-watchers/ApplicationCreated.js";
+import { watchBudgetChanged } from "./event-watchers/BudgetChanged.js";
+import { watchCancelTaskRequested } from "./event-watchers/CancelTaskRequested.js";
+import { watchDeadlineChanged } from "./event-watchers/DeadlineChanged.js";
+import { watchManagerChanged } from "./event-watchers/ManagerChanged.js";
+import { watchMetadataChanged } from "./event-watchers/MetadataChanged.js";
+import { watchPartialPayment } from "./event-watchers/PartialPayment.js";
+import { watchRequestAccepted } from "./event-watchers/RequestAccepted.js";
+import { watchRequestExecuted } from "./event-watchers/RequestExecuted.js";
+import { watchSubmissionCreated } from "./event-watchers/SubmissionCreated.js";
+import { watchSubmissionReviewed } from "./event-watchers/SubmissionReviewed.js";
+import { watchTaskCancelled } from "./event-watchers/TaskCancelled.js";
+import { watchTaskCompleted } from "./event-watchers/TaskCompleted.js";
+import { watchTaskCreated } from "./event-watchers/TaskCreated.js";
+import { watchTaskTaken } from "./event-watchers/TaskTaken.js";
+import { TaskEvent } from "./types/task-events.js";
+import { Dispute, IndexedDraft, IndexedTask } from "./types/tasks.js";
+import { User } from "./types/user.js";
+import { MultischainWatcher } from "./utils/multichain-watcher.js";
+import { PersistentJson } from "./utils/persistent-json.js";
+import { watchRewardIncreased } from "./event-watchers/RewardIncreased.js";
+import { watchDisputeCreated } from "./event-watchers/extensions/DisputeCreated.js";
 
 export interface TasksStorage {
   [chainId: number]: {
@@ -62,7 +62,7 @@ export interface Storage {
 async function start() {
   const loadEnvResult = loadEnv();
   if (loadEnvResult.error) {
-    console.warn(`Error while loading .env: ${JSON.stringify(loadEnvResult.error)}`);
+    console.warn(`Error while loading .env: ${loadEnvResult.error}`);
   }
 
   // Make contract watcher for each chain (using Infura provider)

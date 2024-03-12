@@ -1,12 +1,12 @@
 import { Address } from "viem";
 
 import { Storage } from "..";
-import { TasksContract } from "../contracts/Tasks";
-import { ManagerChanged } from "../types/task-events";
-import { TaskRole } from "../types/user";
-import { ContractWatcher } from "../utils/contract-watcher";
-import { addEvent, createTaskIfNotExists } from "./taskHelpers";
-import { createUserTaskNetworkIfNotExists, normalizeAddress } from "./userHelpers";
+import { TasksContract } from "../contracts/Tasks.js";
+import { ManagerChanged } from "../types/task-events.js";
+import { TaskRole } from "../types/user.js";
+import { ContractWatcher } from "../utils/contract-watcher.js";
+import { addEvent, createTaskIfNotExists } from "./taskHelpers.js";
+import { createUserTaskNetworkIfNotExists, normalizeAddress } from "./userHelpers.js";
 
 export function watchManagerChanged(contractWatcher: ContractWatcher, storage: Storage) {
   contractWatcher.startWatching("ManagerChanged", {

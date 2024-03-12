@@ -1,6 +1,6 @@
 import axios from "axios";
 
-import { getFromIpfs } from "./ipfs";
+import { getFromIpfs } from "./ipfs.js";
 
 export async function fetchMetadata(metadataUri: string): Promise<string> {
   if (metadataUri === "") {

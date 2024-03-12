@@ -1,9 +1,9 @@
 import { Storage } from "..";
-import { TasksContract } from "../contracts/Tasks";
-import { TaskCompleted } from "../types/task-events";
-import { TaskCompletionSource, TaskState } from "../types/tasks";
-import { ContractWatcher } from "../utils/contract-watcher";
-import { addEvent, createTaskIfNotExists } from "./taskHelpers";
+import { TasksContract } from "../contracts/Tasks.js";
+import { TaskCompleted } from "../types/task-events.js";
+import { TaskCompletionSource, TaskState } from "../types/tasks.js";
+import { ContractWatcher } from "../utils/contract-watcher.js";
+import { addEvent, createTaskIfNotExists } from "./taskHelpers.js";
 
 export function watchTaskCompleted(contractWatcher: ContractWatcher, storage: Storage) {
   contractWatcher.startWatching("TaskCompleted", {

@@ -1,11 +1,11 @@
 import { Storage } from "..";
-import { TasksContract } from "../contracts/Tasks";
-import { ApplicationCreated } from "../types/task-events";
-import { TaskRole } from "../types/user";
-import { ContractWatcher } from "../utils/contract-watcher";
-import { fetchMetadata } from "../utils/metadata-fetch";
-import { addEvent, createApplicationIfNotExists } from "./taskHelpers";
-import { createUserTaskIfNotExists, normalizeAddress } from "./userHelpers";
+import { TasksContract } from "../contracts/Tasks.js";
+import { ApplicationCreated } from "../types/task-events.js";
+import { TaskRole } from "../types/user.js";
+import { ContractWatcher } from "../utils/contract-watcher.js";
+import { fetchMetadata } from "../utils/metadata-fetch.js";
+import { addEvent, createApplicationIfNotExists } from "./taskHelpers.js";
+import { createUserTaskIfNotExists, normalizeAddress } from "./userHelpers.js";
 
 export function watchApplicationCreated(contractWatcher: ContractWatcher, storage: Storage) {
   contractWatcher.startWatching("ApplicationCreated", {

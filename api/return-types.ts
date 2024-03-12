@@ -1,6 +1,6 @@
-import { TaskEvent } from "../types/task-events";
-import { Dispute, IndexedDraft, IndexedTask } from "../types/tasks";
-import { User } from "../types/user";
+import { TaskEvent } from "../types/task-events.js";
+import { Dispute, IndexedDraft, IndexedTask } from "../types/tasks.js";
+import { User } from "../types/user.js";
 
 export type TaskReturn = IndexedTask;
 

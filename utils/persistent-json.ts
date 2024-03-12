@@ -1,6 +1,6 @@
 import storage from "node-persist";
 
-import { replacer, reviver } from "./json";
+import { replacer, reviver } from "./json.js";
 
 export class PersistentJson<T> {
   private storageKey: string;
