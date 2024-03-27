@@ -259,4 +259,67 @@ export function registerRoutes(app: Express, storage: Storage) {
 
     res.end(JSON.stringify(taskDrafts, replacer));
   });
+
+  // Get single rfp
+  app.get(basePath + "rfp/:chainId/:rfpId", async function (req, res) {
+    const chainId = parseInt(req.params.chainId);
+    if (Number.isNaN(chainId)) {
+      return malformedRequest(res, "chainId is not a valid number");
+    }
+
+    const rfpId = parseBigInt(req.params.rfpId);
+    if (rfpId === undefined) {
+      return malformedRequest(res, "rfpId is not a valid bigint");
+    }
+
+    const rfps = await storage.rfps.get();
+    if (!rfps[chainId]) {
+      res.statusCode = 404;
+      return res.end("Chain not found");
+    }
+
+    const rfp = rfps[chainId][rfpId.toString()];
+    if (!rfp) {
+      res.statusCode = 404;
+      return res.end("RFP not found");
+    }
+
+    res.end(JSON.stringify(rfp, replacer));
+  });
+
+  // Get single rfp event (newer events have higher index)
+  app.get(basePath + "rfpEvent/:eventIndex", async function (req, res) {
+    const eventIndex = parseInt(req.params.eventIndex);
+    if (Number.isNaN(eventIndex)) {
+      return malformedRequest(res, "eventIndex is not a valid number");
+    }
+
+    const rfpsEvents = await storage.rfpsEvents.get();
+    const event = rfpsEvents[eventIndex];
+
+    if (!event) {
+      res.statusCode = 404;
+      return res.end("RFP event not found");
+    }
+
+    res.end(JSON.stringify(event, replacer));
+  });
+
+  // Get total rfp count
+  app.get(basePath + "totalRFPs", async function (_, res) {
+    const rfps = await storage.rfps.get();
+    const totalRFPs = Object.values(rfps)
+      .map((chainRFPs) => Object.values(chainRFPs))
+      .flat(1).length;
+
+    res.end(JSON.stringify({ totalRFPs: totalRFPs }));
+  });
+
+  // Get total rfp event count
+  app.get(basePath + "totalRFPEvents", async function (_, res) {
+    const rfpsEvents = await storage.rfpsEvents.get();
+    const totalEvents = rfpsEvents.length;
+
+    res.end(JSON.stringify({ totalRFPEvents: totalEvents }));
+  });
 }

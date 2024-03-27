@@ -28,6 +28,13 @@ import { MultischainWatcher } from "./utils/multichain-watcher.js";
 import { PersistentJson } from "./utils/persistent-json.js";
 import { watchRewardIncreased } from "./event-watchers/RewardIncreased.js";
 import { watchDisputeCreated } from "./event-watchers/extensions/DisputeCreated.js";
+import { IndexedRFP } from "./types/rfp.js";
+import { RFPEvent } from "./types/rfp-events.js";
+import { watchDraftCreated } from "./event-watchers/extensions/DraftCreated.js";
+import { watchRFPCreated } from "./event-watchers/rfps/RFPCreated.js";
+import { watchRFPEmptied } from "./event-watchers/rfps/RFPEmptied.js";
+import { watchProjectSubmitted } from "./event-watchers/rfps/ProjectSubmitted.js";
+import { watchProjectAccepted } from "./event-watchers/rfps/ProjectAccepted.js";
 
 export interface TasksStorage {
   [chainId: number]: {
@@ -50,6 +57,13 @@ export interface DraftsStorage {
   };
 }
 
+export interface RFPsStorage {
+  [chainId: number]: {
+    [rfpId: string]: IndexedRFP;
+  };
+}
+export type RFPsEventsStorage = RFPEvent[];
+
 export interface Storage {
   tasks: PersistentJson<TasksStorage>;
   tasksEvents: PersistentJson<TasksEventsStorage>;
@@ -57,6 +71,9 @@ export interface Storage {
 
   disputes: PersistentJson<DisputesStorage>;
   drafts: PersistentJson<DraftsStorage>;
+
+  rfps: PersistentJson<RFPsStorage>;
+  rfpsEvents: PersistentJson<RFPsEventsStorage>;
 }
 
 async function start() {
@@ -94,6 +111,9 @@ async function start() {
 
     disputes: new PersistentJson<DisputesStorage>("disputes", {}),
     drafts: new PersistentJson<DraftsStorage>("drafts", {}),
+
+    rfps: new PersistentJson<RFPsStorage>("rfps", {}),
+    rfpsEvents: new PersistentJson<RFPsEventsStorage>("rfpsEvents", []),
   };
 
   multichainWatcher.forEach((contractWatcher) => {
@@ -118,6 +138,12 @@ async function start() {
     watchPartialPayment(contractWatcher, storage);
 
     watchDisputeCreated(contractWatcher, storage);
+    watchDraftCreated(contractWatcher, storage);
+
+    watchRFPCreated(contractWatcher, storage);
+    watchProjectSubmitted(contractWatcher, storage);
+    watchProjectAccepted(contractWatcher, storage);
+    watchRFPEmptied(contractWatcher, storage);
   });
 
   process.on("SIGINT", function () {

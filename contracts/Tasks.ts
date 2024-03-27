@@ -1,5 +1,5 @@
 export const TasksContract = {
-  address: "0xe01ed3FD86b4a2Ae10F5F9b05507F8c0806604e0",
+  address: "0xeF699CA61f04916358e446bA0DbB9C6Ab9F86A5C",
   abi: [
     { type: "constructor", inputs: [], stateMutability: "nonpayable" },
     {
@@ -7,11 +7,7 @@ export const TasksContract = {
       name: "acceptApplications",
       inputs: [
         { name: "_taskId", type: "uint256", internalType: "uint256" },
-        {
-          name: "_applicationIds",
-          type: "uint32[]",
-          internalType: "uint32[]",
-        },
+        { name: "_applicationIds", type: "uint32[]", internalType: "uint32[]" },
       ],
       outputs: [],
       stateMutability: "nonpayable",
@@ -21,11 +17,7 @@ export const TasksContract = {
       name: "acceptRequest",
       inputs: [
         { name: "_taskId", type: "uint256", internalType: "uint256" },
-        {
-          name: "_requestType",
-          type: "uint8",
-          internalType: "enum ITasks.RequestType",
-        },
+        { name: "_requestType", type: "uint8", internalType: "enum ITasks.RequestType" },
         { name: "_requestId", type: "uint8", internalType: "uint8" },
         { name: "_execute", type: "bool", internalType: "bool" },
       ],
@@ -58,13 +50,7 @@ export const TasksContract = {
           ],
         },
       ],
-      outputs: [
-        {
-          name: "applicationId",
-          type: "uint32",
-          internalType: "uint32",
-        },
-      ],
+      outputs: [{ name: "applicationId", type: "uint32", internalType: "uint32" }],
       stateMutability: "nonpayable",
     },
     {
@@ -74,13 +60,7 @@ export const TasksContract = {
         { name: "_taskId", type: "uint256", internalType: "uint256" },
         { name: "_metadata", type: "string", internalType: "string" },
       ],
-      outputs: [
-        {
-          name: "cancelTaskRequestId",
-          type: "uint8",
-          internalType: "uint8",
-        },
-      ],
+      outputs: [{ name: "cancelTaskRequestId", type: "uint8", internalType: "uint8" }],
       stateMutability: "nonpayable",
     },
     {
@@ -88,16 +68,8 @@ export const TasksContract = {
       name: "completeByDispute",
       inputs: [
         { name: "_taskId", type: "uint256", internalType: "uint256" },
-        {
-          name: "_partialNativeReward",
-          type: "uint96[]",
-          internalType: "uint96[]",
-        },
-        {
-          name: "_partialReward",
-          type: "uint88[]",
-          internalType: "uint88[]",
-        },
+        { name: "_partialNativeReward", type: "uint96[]", internalType: "uint96[]" },
+        { name: "_partialReward", type: "uint88[]", internalType: "uint88[]" },
       ],
       outputs: [],
       stateMutability: "nonpayable",
@@ -119,21 +91,13 @@ export const TasksContract = {
         { name: "_metadata", type: "string", internalType: "string" },
         { name: "_deadline", type: "uint64", internalType: "uint64" },
         { name: "_manager", type: "address", internalType: "address" },
-        {
-          name: "_disputeManager",
-          type: "address",
-          internalType: "address",
-        },
+        { name: "_disputeManager", type: "address", internalType: "address" },
         {
           name: "_budget",
           type: "tuple[]",
           internalType: "struct ITasks.ERC20Transfer[]",
           components: [
-            {
-              name: "tokenContract",
-              type: "address",
-              internalType: "contract IERC20",
-            },
+            { name: "tokenContract", type: "address", internalType: "contract IERC20" },
             { name: "amount", type: "uint96", internalType: "uint96" },
           ],
         },
@@ -142,26 +106,14 @@ export const TasksContract = {
           type: "tuple[]",
           internalType: "struct ITasks.PreapprovedApplication[]",
           components: [
-            {
-              name: "applicant",
-              type: "address",
-              internalType: "address",
-            },
+            { name: "applicant", type: "address", internalType: "address" },
             {
               name: "nativeReward",
               type: "tuple[]",
               internalType: "struct ITasks.NativeReward[]",
               components: [
-                {
-                  name: "to",
-                  type: "address",
-                  internalType: "address",
-                },
-                {
-                  name: "amount",
-                  type: "uint96",
-                  internalType: "uint96",
-                },
+                { name: "to", type: "address", internalType: "address" },
+                { name: "amount", type: "uint96", internalType: "uint96" },
               ],
             },
             {
@@ -169,21 +121,9 @@ export const TasksContract = {
               type: "tuple[]",
               internalType: "struct ITasks.Reward[]",
               components: [
-                {
-                  name: "nextToken",
-                  type: "bool",
-                  internalType: "bool",
-                },
-                {
-                  name: "to",
-                  type: "address",
-                  internalType: "address",
-                },
-                {
-                  name: "amount",
-                  type: "uint88",
-                  internalType: "uint88",
-                },
+                { name: "nextToken", type: "bool", internalType: "bool" },
+                { name: "to", type: "address", internalType: "address" },
+                { name: "amount", type: "uint88", internalType: "uint88" },
               ],
             },
           ],
@@ -191,13 +131,6 @@ export const TasksContract = {
       ],
       outputs: [{ name: "taskId", type: "uint256", internalType: "uint256" }],
       stateMutability: "payable",
-    },
-    {
-      type: "function",
-      name: "disable",
-      inputs: [],
-      outputs: [],
-      stateMutability: "nonpayable",
     },
     {
       type: "function",
@@ -214,11 +147,7 @@ export const TasksContract = {
       name: "executeRequest",
       inputs: [
         { name: "_taskId", type: "uint256", internalType: "uint256" },
-        {
-          name: "_requestType",
-          type: "uint8",
-          internalType: "enum ITasks.RequestType",
-        },
+        { name: "_requestType", type: "uint8", internalType: "enum ITasks.RequestType" },
         { name: "_requestId", type: "uint8", internalType: "uint8" },
       ],
       outputs: [],
@@ -244,66 +173,22 @@ export const TasksContract = {
           type: "tuple",
           internalType: "struct ITasks.OffChainTask",
           components: [
-            {
-              name: "metadata",
-              type: "string",
-              internalType: "string",
-            },
-            {
-              name: "deadline",
-              type: "uint64",
-              internalType: "uint64",
-            },
-            {
-              name: "executorApplication",
-              type: "uint32",
-              internalType: "uint32",
-            },
-            {
-              name: "manager",
-              type: "address",
-              internalType: "address",
-            },
-            {
-              name: "disputeManager",
-              type: "address",
-              internalType: "address",
-            },
-            {
-              name: "creator",
-              type: "address",
-              internalType: "address",
-            },
-            {
-              name: "state",
-              type: "uint8",
-              internalType: "enum ITasks.TaskState",
-            },
-            {
-              name: "escrow",
-              type: "address",
-              internalType: "contract Escrow",
-            },
-            {
-              name: "nativeBudget",
-              type: "uint96",
-              internalType: "uint96",
-            },
+            { name: "metadata", type: "string", internalType: "string" },
+            { name: "deadline", type: "uint64", internalType: "uint64" },
+            { name: "executorApplication", type: "uint32", internalType: "uint32" },
+            { name: "manager", type: "address", internalType: "address" },
+            { name: "disputeManager", type: "address", internalType: "address" },
+            { name: "creator", type: "address", internalType: "address" },
+            { name: "state", type: "uint8", internalType: "enum ITasks.TaskState" },
+            { name: "escrow", type: "address", internalType: "contract Escrow" },
+            { name: "nativeBudget", type: "uint96", internalType: "uint96" },
             {
               name: "budget",
               type: "tuple[]",
               internalType: "struct ITasks.ERC20Transfer[]",
               components: [
-                {
-                  name: "tokenContract",
-                  type: "address",
-                  internalType: "contract IERC20",
-                },
-                {
-                  name: "amount",
-                  type: "uint96",
-                  internalType: "uint96",
-                },
+                { name: "tokenContract", type: "address", internalType: "contract IERC20" },
+                { name: "amount", type: "uint96", internalType: "uint96" },
               ],
             },
             {
@@ -311,36 +196,16 @@ export const TasksContract = {
               type: "tuple[]",
               internalType: "struct ITasks.OffChainApplication[]",
               components: [
-                {
-                  name: "metadata",
-                  type: "string",
-                  internalType: "string",
-                },
-                {
-                  name: "applicant",
-                  type: "address",
-                  internalType: "address",
-                },
-                {
-                  name: "accepted",
-                  type: "bool",
-                  internalType: "bool",
-                },
+                { name: "metadata", type: "string", internalType: "string" },
+                { name: "applicant", type: "address", internalType: "address" },
+                { name: "accepted", type: "bool", internalType: "bool" },
                 {
                   name: "nativeReward",
                   type: "tuple[]",
                   internalType: "struct ITasks.NativeReward[]",
                   components: [
-                    {
-                      name: "to",
-                      type: "address",
-                      internalType: "address",
-                    },
-                    {
-                      name: "amount",
-                      type: "uint96",
-                      internalType: "uint96",
-                    },
+                    { name: "to", type: "address", internalType: "address" },
+                    { name: "amount", type: "uint96", internalType: "uint96" },
                   ],
                 },
                 {
@@ -348,21 +213,9 @@ export const TasksContract = {
                   type: "tuple[]",
                   internalType: "struct ITasks.Reward[]",
                   components: [
-                    {
-                      name: "nextToken",
-                      type: "bool",
-                      internalType: "bool",
-                    },
-                    {
-                      name: "to",
-                      type: "address",
-                      internalType: "address",
-                    },
-                    {
-                      name: "amount",
-                      type: "uint88",
-                      internalType: "uint88",
-                    },
+                    { name: "nextToken", type: "bool", internalType: "bool" },
+                    { name: "to", type: "address", internalType: "address" },
+                    { name: "amount", type: "uint88", internalType: "uint88" },
                   ],
                 },
               ],
@@ -372,21 +225,9 @@ export const TasksContract = {
               type: "tuple[]",
               internalType: "struct ITasks.Submission[]",
               components: [
-                {
-                  name: "metadata",
-                  type: "string",
-                  internalType: "string",
-                },
-                {
-                  name: "feedback",
-                  type: "string",
-                  internalType: "string",
-                },
-                {
-                  name: "judgement",
-                  type: "uint8",
-                  internalType: "enum ITasks.SubmissionJudgement",
-                },
+                { name: "metadata", type: "string", internalType: "string" },
+                { name: "feedback", type: "string", internalType: "string" },
+                { name: "judgement", type: "uint8", internalType: "enum ITasks.SubmissionJudgement" },
               ],
             },
             {
@@ -399,23 +240,11 @@ export const TasksContract = {
                   type: "tuple",
                   internalType: "struct ITasks.Request",
                   components: [
-                    {
-                      name: "accepted",
-                      type: "bool",
-                      internalType: "bool",
-                    },
-                    {
-                      name: "executed",
-                      type: "bool",
-                      internalType: "bool",
-                    },
+                    { name: "accepted", type: "bool", internalType: "bool" },
+                    { name: "executed", type: "bool", internalType: "bool" },
                   ],
                 },
-                {
-                  name: "metadata",
-                  type: "string",
-                  internalType: "string",
-                },
+                { name: "metadata", type: "string", internalType: "string" },
               ],
             },
           ],
@@ -426,79 +255,29 @@ export const TasksContract = {
     {
       type: "function",
       name: "getTasks",
-      inputs: [
-        {
-          name: "_taskIds",
-          type: "uint256[]",
-          internalType: "uint256[]",
-        },
-      ],
+      inputs: [{ name: "_taskIds", type: "uint256[]", internalType: "uint256[]" }],
       outputs: [
         {
           name: "",
           type: "tuple[]",
           internalType: "struct ITasks.OffChainTask[]",
           components: [
-            {
-              name: "metadata",
-              type: "string",
-              internalType: "string",
-            },
-            {
-              name: "deadline",
-              type: "uint64",
-              internalType: "uint64",
-            },
-            {
-              name: "executorApplication",
-              type: "uint32",
-              internalType: "uint32",
-            },
-            {
-              name: "manager",
-              type: "address",
-              internalType: "address",
-            },
-            {
-              name: "disputeManager",
-              type: "address",
-              internalType: "address",
-            },
-            {
-              name: "creator",
-              type: "address",
-              internalType: "address",
-            },
-            {
-              name: "state",
-              type: "uint8",
-              internalType: "enum ITasks.TaskState",
-            },
-            {
-              name: "escrow",
-              type: "address",
-              internalType: "contract Escrow",
-            },
-            {
-              name: "nativeBudget",
-              type: "uint96",
-              internalType: "uint96",
-            },
+            { name: "metadata", type: "string", internalType: "string" },
+            { name: "deadline", type: "uint64", internalType: "uint64" },
+            { name: "executorApplication", type: "uint32", internalType: "uint32" },
+            { name: "manager", type: "address", internalType: "address" },
+            { name: "disputeManager", type: "address", internalType: "address" },
+            { name: "creator", type: "address", internalType: "address" },
+            { name: "state", type: "uint8", internalType: "enum ITasks.TaskState" },
+            { name: "escrow", type: "address", internalType: "contract Escrow" },
+            { name: "nativeBudget", type: "uint96", internalType: "uint96" },
             {
               name: "budget",
               type: "tuple[]",
               internalType: "struct ITasks.ERC20Transfer[]",
               components: [
-                {
-                  name: "tokenContract",
-                  type: "address",
-                  internalType: "contract IERC20",
-                },
-                {
-                  name: "amount",
-                  type: "uint96",
-                  internalType: "uint96",
-                },
+                { name: "tokenContract", type: "address", internalType: "contract IERC20" },
+                { name: "amount", type: "uint96", internalType: "uint96" },
               ],
             },
             {
@@ -506,36 +285,16 @@ export const TasksContract = {
               type: "tuple[]",
               internalType: "struct ITasks.OffChainApplication[]",
               components: [
-                {
-                  name: "metadata",
-                  type: "string",
-                  internalType: "string",
-                },
-                {
-                  name: "applicant",
-                  type: "address",
-                  internalType: "address",
-                },
-                {
-                  name: "accepted",
-                  type: "bool",
-                  internalType: "bool",
-                },
+                { name: "metadata", type: "string", internalType: "string" },
+                { name: "applicant", type: "address", internalType: "address" },
+                { name: "accepted", type: "bool", internalType: "bool" },
                 {
                   name: "nativeReward",
                   type: "tuple[]",
                   internalType: "struct ITasks.NativeReward[]",
                   components: [
-                    {
-                      name: "to",
-                      type: "address",
-                      internalType: "address",
-                    },
-                    {
-                      name: "amount",
-                      type: "uint96",
-                      internalType: "uint96",
-                    },
+                    { name: "to", type: "address", internalType: "address" },
+                    { name: "amount", type: "uint96", internalType: "uint96" },
                   ],
                 },
                 {
@@ -543,21 +302,9 @@ export const TasksContract = {
                   type: "tuple[]",
                   internalType: "struct ITasks.Reward[]",
                   components: [
-                    {
-                      name: "nextToken",
-                      type: "bool",
-                      internalType: "bool",
-                    },
-                    {
-                      name: "to",
-                      type: "address",
-                      internalType: "address",
-                    },
-                    {
-                      name: "amount",
-                      type: "uint88",
-                      internalType: "uint88",
-                    },
+                    { name: "nextToken", type: "bool", internalType: "bool" },
+                    { name: "to", type: "address", internalType: "address" },
+                    { name: "amount", type: "uint88", internalType: "uint88" },
                   ],
                 },
               ],
@@ -567,21 +314,9 @@ export const TasksContract = {
               type: "tuple[]",
               internalType: "struct ITasks.Submission[]",
               components: [
-                {
-                  name: "metadata",
-                  type: "string",
-                  internalType: "string",
-                },
-                {
-                  name: "feedback",
-                  type: "string",
-                  internalType: "string",
-                },
-                {
-                  name: "judgement",
-                  type: "uint8",
-                  internalType: "enum ITasks.SubmissionJudgement",
-                },
+                { name: "metadata", type: "string", internalType: "string" },
+                { name: "feedback", type: "string", internalType: "string" },
+                { name: "judgement", type: "uint8", internalType: "enum ITasks.SubmissionJudgement" },
               ],
             },
             {
@@ -594,23 +329,11 @@ export const TasksContract = {
                   type: "tuple",
                   internalType: "struct ITasks.Request",
                   components: [
-                    {
-                      name: "accepted",
-                      type: "bool",
-                      internalType: "bool",
-                    },
-                    {
-                      name: "executed",
-                      type: "bool",
-                      internalType: "bool",
-                    },
+                    { name: "accepted", type: "bool", internalType: "bool" },
+                    { name: "executed", type: "bool", internalType: "bool" },
                   ],
                 },
-                {
-                  name: "metadata",
-                  type: "string",
-                  internalType: "string",
-                },
+                { name: "metadata", type: "string", internalType: "string" },
               ],
             },
           ],
@@ -623,11 +346,7 @@ export const TasksContract = {
       name: "increaseBudget",
       inputs: [
         { name: "_taskId", type: "uint256", internalType: "uint256" },
-        {
-          name: "_increase",
-          type: "uint96[]",
-          internalType: "uint96[]",
-        },
+        { name: "_increase", type: "uint96[]", internalType: "uint96[]" },
       ],
       outputs: [],
       stateMutability: "payable",
@@ -637,55 +356,22 @@ export const TasksContract = {
       name: "increaseReward",
       inputs: [
         { name: "_taskId", type: "uint256", internalType: "uint256" },
-        {
-          name: "_applicationId",
-          type: "uint32",
-          internalType: "uint32",
-        },
-        {
-          name: "_nativeIncrease",
-          type: "uint96[]",
-          internalType: "uint96[]",
-        },
-        {
-          name: "_increase",
-          type: "uint88[]",
-          internalType: "uint88[]",
-        },
+        { name: "_applicationId", type: "uint32", internalType: "uint32" },
+        { name: "_nativeIncrease", type: "uint96[]", internalType: "uint96[]" },
+        { name: "_increase", type: "uint88[]", internalType: "uint88[]" },
       ],
       outputs: [],
       stateMutability: "nonpayable",
     },
-    {
-      type: "function",
-      name: "owner",
-      inputs: [],
-      outputs: [{ name: "", type: "address", internalType: "address" }],
-      stateMutability: "pure",
-    },
+    { type: "function", name: "owner", inputs: [], outputs: [{ name: "", type: "address", internalType: "address" }], stateMutability: "pure" },
     {
       type: "function",
       name: "partialPayment",
       inputs: [
         { name: "_taskId", type: "uint256", internalType: "uint256" },
-        {
-          name: "_partialNativeReward",
-          type: "uint96[]",
-          internalType: "uint96[]",
-        },
-        {
-          name: "_partialReward",
-          type: "uint88[]",
-          internalType: "uint88[]",
-        },
+        { name: "_partialNativeReward", type: "uint96[]", internalType: "uint96[]" },
+        { name: "_partialReward", type: "uint88[]", internalType: "uint88[]" },
       ],
-      outputs: [],
-      stateMutability: "nonpayable",
-    },
-    {
-      type: "function",
-      name: "refund",
-      inputs: [{ name: "_taskId", type: "uint256", internalType: "uint256" }],
       outputs: [],
       stateMutability: "nonpayable",
     },
@@ -694,11 +380,7 @@ export const TasksContract = {
       name: "rescue",
       inputs: [
         { name: "_taskId", type: "uint256", internalType: "uint256" },
-        {
-          name: "token",
-          type: "address",
-          internalType: "contract IERC20",
-        },
+        { name: "token", type: "address", internalType: "contract IERC20" },
         { name: "to", type: "address", internalType: "address" },
         { name: "amount", type: "uint256", internalType: "uint256" },
       ],
@@ -710,11 +392,7 @@ export const TasksContract = {
       name: "rescueNative",
       inputs: [
         { name: "_taskId", type: "uint256", internalType: "uint256" },
-        {
-          name: "to",
-          type: "address",
-          internalType: "address payable",
-        },
+        { name: "to", type: "address", internalType: "address payable" },
         { name: "amount", type: "uint256", internalType: "uint256" },
       ],
       outputs: [],
@@ -726,11 +404,7 @@ export const TasksContract = {
       inputs: [
         { name: "_taskId", type: "uint256", internalType: "uint256" },
         { name: "_submissionId", type: "uint8", internalType: "uint8" },
-        {
-          name: "_judgement",
-          type: "uint8",
-          internalType: "enum ITasks.SubmissionJudgement",
-        },
+        { name: "_judgement", type: "uint8", internalType: "enum ITasks.SubmissionJudgement" },
         { name: "_feedback", type: "string", internalType: "string" },
       ],
       outputs: [],
@@ -741,32 +415,18 @@ export const TasksContract = {
       name: "takeTask",
       inputs: [
         { name: "_taskId", type: "uint256", internalType: "uint256" },
-        {
-          name: "_applicationId",
-          type: "uint32",
-          internalType: "uint32",
-        },
+        { name: "_applicationId", type: "uint32", internalType: "uint32" },
       ],
       outputs: [],
       stateMutability: "nonpayable",
     },
-    {
-      type: "function",
-      name: "taskCount",
-      inputs: [],
-      outputs: [{ name: "", type: "uint256", internalType: "uint256" }],
-      stateMutability: "view",
-    },
+    { type: "function", name: "taskCount", inputs: [], outputs: [{ name: "", type: "uint256", internalType: "uint256" }], stateMutability: "view" },
     {
       type: "function",
       name: "transferManagement",
       inputs: [
         { name: "_taskId", type: "uint256", internalType: "uint256" },
-        {
-          name: "_newManager",
-          type: "address",
-          internalType: "address",
-        },
+        { name: "_newManager", type: "address", internalType: "address" },
       ],
       outputs: [],
       stateMutability: "nonpayable",
@@ -775,18 +435,8 @@ export const TasksContract = {
       type: "event",
       name: "ApplicationAccepted",
       inputs: [
-        {
-          name: "taskId",
-          type: "uint256",
-          indexed: true,
-          internalType: "uint256",
-        },
-        {
-          name: "applicationId",
-          type: "uint32",
-          indexed: true,
-          internalType: "uint32",
-        },
+        { name: "taskId", type: "uint256", indexed: true, internalType: "uint256" },
+        { name: "applicationId", type: "uint32", indexed: true, internalType: "uint32" },
       ],
       anonymous: false,
     },
@@ -794,30 +444,10 @@ export const TasksContract = {
       type: "event",
       name: "ApplicationCreated",
       inputs: [
-        {
-          name: "taskId",
-          type: "uint256",
-          indexed: true,
-          internalType: "uint256",
-        },
-        {
-          name: "applicationId",
-          type: "uint32",
-          indexed: true,
-          internalType: "uint32",
-        },
-        {
-          name: "metadata",
-          type: "string",
-          indexed: false,
-          internalType: "string",
-        },
-        {
-          name: "applicant",
-          type: "address",
-          indexed: false,
-          internalType: "address",
-        },
+        { name: "taskId", type: "uint256", indexed: true, internalType: "uint256" },
+        { name: "applicationId", type: "uint32", indexed: true, internalType: "uint32" },
+        { name: "metadata", type: "string", indexed: false, internalType: "string" },
+        { name: "applicant", type: "address", indexed: false, internalType: "address" },
         {
           name: "nativeReward",
           type: "tuple[]",
@@ -842,41 +472,14 @@ export const TasksContract = {
       ],
       anonymous: false,
     },
-    {
-      type: "event",
-      name: "BudgetChanged",
-      inputs: [
-        {
-          name: "taskId",
-          type: "uint256",
-          indexed: true,
-          internalType: "uint256",
-        },
-      ],
-      anonymous: false,
-    },
+    { type: "event", name: "BudgetChanged", inputs: [{ name: "taskId", type: "uint256", indexed: true, internalType: "uint256" }], anonymous: false },
     {
       type: "event",
       name: "CancelTaskRequested",
       inputs: [
-        {
-          name: "taskId",
-          type: "uint256",
-          indexed: true,
-          internalType: "uint256",
-        },
-        {
-          name: "requestId",
-          type: "uint8",
-          indexed: true,
-          internalType: "uint8",
-        },
-        {
-          name: "metadata",
-          type: "string",
-          indexed: false,
-          internalType: "string",
-        },
+        { name: "taskId", type: "uint256", indexed: true, internalType: "uint256" },
+        { name: "requestId", type: "uint8", indexed: true, internalType: "uint8" },
+        { name: "metadata", type: "string", indexed: false, internalType: "string" },
       ],
       anonymous: false,
     },
@@ -884,18 +487,8 @@ export const TasksContract = {
       type: "event",
       name: "DeadlineChanged",
       inputs: [
-        {
-          name: "taskId",
-          type: "uint256",
-          indexed: true,
-          internalType: "uint256",
-        },
-        {
-          name: "newDeadline",
-          type: "uint64",
-          indexed: false,
-          internalType: "uint64",
-        },
+        { name: "taskId", type: "uint256", indexed: true, internalType: "uint256" },
+        { name: "newDeadline", type: "uint64", indexed: false, internalType: "uint64" },
       ],
       anonymous: false,
     },
@@ -903,18 +496,8 @@ export const TasksContract = {
       type: "event",
       name: "ManagerChanged",
       inputs: [
-        {
-          name: "taskId",
-          type: "uint256",
-          indexed: true,
-          internalType: "uint256",
-        },
-        {
-          name: "newManager",
-          type: "address",
-          indexed: false,
-          internalType: "address",
-        },
+        { name: "taskId", type: "uint256", indexed: true, internalType: "uint256" },
+        { name: "newManager", type: "address", indexed: false, internalType: "address" },
       ],
       anonymous: false,
     },
@@ -922,18 +505,8 @@ export const TasksContract = {
       type: "event",
       name: "MetadataChanged",
       inputs: [
-        {
-          name: "taskId",
-          type: "uint256",
-          indexed: true,
-          internalType: "uint256",
-        },
-        {
-          name: "newMetadata",
-          type: "string",
-          indexed: false,
-          internalType: "string",
-        },
+        { name: "taskId", type: "uint256", indexed: true, internalType: "uint256" },
+        { name: "newMetadata", type: "string", indexed: false, internalType: "string" },
       ],
       anonymous: false,
     },
@@ -941,24 +514,9 @@ export const TasksContract = {
       type: "event",
       name: "PartialPayment",
       inputs: [
-        {
-          name: "taskId",
-          type: "uint256",
-          indexed: true,
-          internalType: "uint256",
-        },
-        {
-          name: "partialNativeReward",
-          type: "uint96[]",
-          indexed: false,
-          internalType: "uint96[]",
-        },
-        {
-          name: "partialReward",
-          type: "uint88[]",
-          indexed: false,
-          internalType: "uint88[]",
-        },
+        { name: "taskId", type: "uint256", indexed: true, internalType: "uint256" },
+        { name: "partialNativeReward", type: "uint96[]", indexed: false, internalType: "uint96[]" },
+        { name: "partialReward", type: "uint88[]", indexed: false, internalType: "uint88[]" },
       ],
       anonymous: false,
     },
@@ -966,24 +524,9 @@ export const TasksContract = {
       type: "event",
       name: "RequestAccepted",
       inputs: [
-        {
-          name: "taskId",
-          type: "uint256",
-          indexed: true,
-          internalType: "uint256",
-        },
-        {
-          name: "requestType",
-          type: "uint8",
-          indexed: true,
-          internalType: "enum ITasks.RequestType",
-        },
-        {
-          name: "requestId",
-          type: "uint8",
-          indexed: true,
-          internalType: "uint8",
-        },
+        { name: "taskId", type: "uint256", indexed: true, internalType: "uint256" },
+        { name: "requestType", type: "uint8", indexed: true, internalType: "enum ITasks.RequestType" },
+        { name: "requestId", type: "uint8", indexed: true, internalType: "uint8" },
       ],
       anonymous: false,
     },
@@ -991,30 +534,10 @@ export const TasksContract = {
       type: "event",
       name: "RequestExecuted",
       inputs: [
-        {
-          name: "taskId",
-          type: "uint256",
-          indexed: true,
-          internalType: "uint256",
-        },
-        {
-          name: "requestType",
-          type: "uint8",
-          indexed: true,
-          internalType: "enum ITasks.RequestType",
-        },
-        {
-          name: "requestId",
-          type: "uint8",
-          indexed: true,
-          internalType: "uint8",
-        },
-        {
-          name: "by",
-          type: "address",
-          indexed: false,
-          internalType: "address",
-        },
+        { name: "taskId", type: "uint256", indexed: true, internalType: "uint256" },
+        { name: "requestType", type: "uint8", indexed: true, internalType: "enum ITasks.RequestType" },
+        { name: "requestId", type: "uint8", indexed: true, internalType: "uint8" },
+        { name: "by", type: "address", indexed: false, internalType: "address" },
       ],
       anonymous: false,
     },
@@ -1022,30 +545,10 @@ export const TasksContract = {
       type: "event",
       name: "RewardIncreased",
       inputs: [
-        {
-          name: "taskId",
-          type: "uint256",
-          indexed: true,
-          internalType: "uint256",
-        },
-        {
-          name: "applicationId",
-          type: "uint32",
-          indexed: true,
-          internalType: "uint32",
-        },
-        {
-          name: "nativeIncrease",
-          type: "uint96[]",
-          indexed: false,
-          internalType: "uint96[]",
-        },
-        {
-          name: "increase",
-          type: "uint88[]",
-          indexed: false,
-          internalType: "uint88[]",
-        },
+        { name: "taskId", type: "uint256", indexed: true, internalType: "uint256" },
+        { name: "applicationId", type: "uint32", indexed: true, internalType: "uint32" },
+        { name: "nativeIncrease", type: "uint96[]", indexed: false, internalType: "uint96[]" },
+        { name: "increase", type: "uint88[]", indexed: false, internalType: "uint88[]" },
       ],
       anonymous: false,
     },
@@ -1053,24 +556,9 @@ export const TasksContract = {
       type: "event",
       name: "SubmissionCreated",
       inputs: [
-        {
-          name: "taskId",
-          type: "uint256",
-          indexed: true,
-          internalType: "uint256",
-        },
-        {
-          name: "submissionId",
-          type: "uint8",
-          indexed: true,
-          internalType: "uint8",
-        },
-        {
-          name: "metadata",
-          type: "string",
-          indexed: false,
-          internalType: "string",
-        },
+        { name: "taskId", type: "uint256", indexed: true, internalType: "uint256" },
+        { name: "submissionId", type: "uint8", indexed: true, internalType: "uint8" },
+        { name: "metadata", type: "string", indexed: false, internalType: "string" },
       ],
       anonymous: false,
     },
@@ -1078,30 +566,10 @@ export const TasksContract = {
       type: "event",
       name: "SubmissionReviewed",
       inputs: [
-        {
-          name: "taskId",
-          type: "uint256",
-          indexed: true,
-          internalType: "uint256",
-        },
-        {
-          name: "submissionId",
-          type: "uint8",
-          indexed: true,
-          internalType: "uint8",
-        },
-        {
-          name: "judgement",
-          type: "uint8",
-          indexed: false,
-          internalType: "enum ITasks.SubmissionJudgement",
-        },
-        {
-          name: "feedback",
-          type: "string",
-          indexed: false,
-          internalType: "string",
-        },
+        { name: "taskId", type: "uint256", indexed: true, internalType: "uint256" },
+        { name: "submissionId", type: "uint8", indexed: true, internalType: "uint8" },
+        { name: "judgement", type: "uint8", indexed: false, internalType: "enum ITasks.SubmissionJudgement" },
+        { name: "feedback", type: "string", indexed: false, internalType: "string" },
       ],
       anonymous: false,
     },
@@ -1109,18 +577,8 @@ export const TasksContract = {
       type: "event",
       name: "TaskCancelled",
       inputs: [
-        {
-          name: "taskId",
-          type: "uint256",
-          indexed: true,
-          internalType: "uint256",
-        },
-        {
-          name: "metadata",
-          type: "string",
-          indexed: false,
-          internalType: "string",
-        },
+        { name: "taskId", type: "uint256", indexed: true, internalType: "uint256" },
+        { name: "metadata", type: "string", indexed: false, internalType: "string" },
       ],
       anonymous: false,
     },
@@ -1128,18 +586,8 @@ export const TasksContract = {
       type: "event",
       name: "TaskCompleted",
       inputs: [
-        {
-          name: "taskId",
-          type: "uint256",
-          indexed: true,
-          internalType: "uint256",
-        },
-        {
-          name: "source",
-          type: "uint8",
-          indexed: false,
-          internalType: "enum ITasks.TaskCompletionSource",
-        },
+        { name: "taskId", type: "uint256", indexed: true, internalType: "uint256" },
+        { name: "source", type: "uint8", indexed: false, internalType: "enum ITasks.TaskCompletionSource" },
       ],
       anonymous: false,
     },
@@ -1147,68 +595,24 @@ export const TasksContract = {
       type: "event",
       name: "TaskCreated",
       inputs: [
-        {
-          name: "taskId",
-          type: "uint256",
-          indexed: true,
-          internalType: "uint256",
-        },
-        {
-          name: "metadata",
-          type: "string",
-          indexed: false,
-          internalType: "string",
-        },
-        {
-          name: "deadline",
-          type: "uint64",
-          indexed: false,
-          internalType: "uint64",
-        },
-        {
-          name: "manager",
-          type: "address",
-          indexed: false,
-          internalType: "address",
-        },
-        {
-          name: "disputeManager",
-          type: "address",
-          indexed: false,
-          internalType: "address",
-        },
-        {
-          name: "creator",
-          type: "address",
-          indexed: false,
-          internalType: "address",
-        },
-        {
-          name: "nativeBudget",
-          type: "uint96",
-          indexed: false,
-          internalType: "uint96",
-        },
+        { name: "taskId", type: "uint256", indexed: true, internalType: "uint256" },
+        { name: "metadata", type: "string", indexed: false, internalType: "string" },
+        { name: "deadline", type: "uint64", indexed: false, internalType: "uint64" },
+        { name: "manager", type: "address", indexed: false, internalType: "address" },
+        { name: "disputeManager", type: "address", indexed: false, internalType: "address" },
+        { name: "creator", type: "address", indexed: false, internalType: "address" },
+        { name: "nativeBudget", type: "uint96", indexed: false, internalType: "uint96" },
         {
           name: "budget",
           type: "tuple[]",
           indexed: false,
           internalType: "struct ITasks.ERC20Transfer[]",
           components: [
-            {
-              name: "tokenContract",
-              type: "address",
-              internalType: "contract IERC20",
-            },
+            { name: "tokenContract", type: "address", internalType: "contract IERC20" },
             { name: "amount", type: "uint96", internalType: "uint96" },
           ],
         },
-        {
-          name: "escrow",
-          type: "address",
-          indexed: false,
-          internalType: "contract Escrow",
-        },
+        { name: "escrow", type: "address", indexed: false, internalType: "contract Escrow" },
       ],
       anonymous: false,
     },
@@ -1216,47 +620,29 @@ export const TasksContract = {
       type: "event",
       name: "TaskTaken",
       inputs: [
-        {
-          name: "taskId",
-          type: "uint256",
-          indexed: true,
-          internalType: "uint256",
-        },
-        {
-          name: "applicationId",
-          type: "uint32",
-          indexed: true,
-          internalType: "uint32",
-        },
+        { name: "taskId", type: "uint256", indexed: true, internalType: "uint256" },
+        { name: "applicationId", type: "uint32", indexed: true, internalType: "uint32" },
       ],
       anonymous: false,
     },
-    {
-      type: "error",
-      name: "AddressEmptyCode",
-      inputs: [{ name: "target", type: "address", internalType: "address" }],
-    },
-    {
-      type: "error",
-      name: "AddressInsufficientBalance",
-      inputs: [{ name: "account", type: "address", internalType: "address" }],
-    },
+    { type: "error", name: "AddressEmptyCode", inputs: [{ name: "target", type: "address", internalType: "address" }] },
     { type: "error", name: "ApplicationDoesNotExist", inputs: [] },
     { type: "error", name: "ApplicationNotAccepted", inputs: [] },
-    { type: "error", name: "Disabled", inputs: [] },
     { type: "error", name: "ERC1167FailedCreateClone", inputs: [] },
-    { type: "error", name: "FailedInnerCall", inputs: [] },
+    { type: "error", name: "FailedCall", inputs: [] },
+    {
+      type: "error",
+      name: "InsufficientBalance",
+      inputs: [
+        { name: "balance", type: "uint256", internalType: "uint256" },
+        { name: "needed", type: "uint256", internalType: "uint256" },
+      ],
+    },
     { type: "error", name: "JudgementNone", inputs: [] },
     { type: "error", name: "ManualBudgetIncreaseNeeded", inputs: [] },
     { type: "error", name: "NativeTransferFailed", inputs: [] },
-    { type: "error", name: "NotDisabled", inputs: [] },
-    { type: "error", name: "NotDisabler", inputs: [] },
     { type: "error", name: "NotDisputeManager", inputs: [] },
-    {
-      type: "error",
-      name: "NotEnoughNativeCurrencyAttached",
-      inputs: [],
-    },
+    { type: "error", name: "NotEnoughNativeCurrencyAttached", inputs: [] },
     { type: "error", name: "NotExecutor", inputs: [] },
     { type: "error", name: "NotManager", inputs: [] },
     { type: "error", name: "NotYourApplication", inputs: [] },
@@ -1268,11 +654,7 @@ export const TasksContract = {
     { type: "error", name: "RequestNotAccepted", inputs: [] },
     { type: "error", name: "RewardAboveBudget", inputs: [] },
     { type: "error", name: "RewardDoesntEndWithNextToken", inputs: [] },
-    {
-      type: "error",
-      name: "SafeERC20FailedOperation",
-      inputs: [{ name: "token", type: "address", internalType: "address" }],
-    },
+    { type: "error", name: "SafeERC20FailedOperation", inputs: [{ name: "token", type: "address", internalType: "address" }] },
     { type: "error", name: "SubmissionAlreadyJudged", inputs: [] },
     { type: "error", name: "SubmissionDoesNotExist", inputs: [] },
     { type: "error", name: "TaskClosed", inputs: [] },
