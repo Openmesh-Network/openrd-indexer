@@ -4,6 +4,7 @@ export interface Filter {
   equal?: string | number | bigint;
   includes?: string | any;
   oneOf?: Filter[];
+  convertValueToLowercase?: boolean;
   objectFilter?: ObjectFilter;
 }
 
@@ -40,7 +41,19 @@ export function passesFilter(value: any, filter: Filter): boolean {
     }
   }
   if (filter.includes) {
-    if (!value.includes(filter.includes)) {
+    let evaluatedValue = value;
+    let evaluatedIncludes = filter.includes;
+
+    if (filter.convertValueToLowercase) {
+      if (typeof value === 'string') {
+        evaluatedValue = value.toLowerCase();
+      }
+      if (typeof filter.includes === 'string') {
+        evaluatedIncludes = filter.includes.toLowerCase();
+      }
+    }
+
+    if (!evaluatedValue.includes(evaluatedIncludes)) {
       return false;
     }
   }
