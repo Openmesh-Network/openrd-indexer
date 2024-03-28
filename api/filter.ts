@@ -4,8 +4,9 @@ export interface Filter {
   equal?: string | number | bigint;
   includes?: string | any;
   oneOf?: Filter[];
-  convertValueToLowercase?: boolean;
   objectFilter?: ObjectFilter;
+
+  convertValueToLowercase?: boolean;
 }
 
 export interface ObjectFilter {
@@ -22,6 +23,14 @@ export function passesFilter(value: any, filter: Filter): boolean {
   if (value === undefined) {
     return false;
   }
+  if (filter.convertValueToLowercase) {
+    if (typeof value === "string") {
+      value = value.toLowerCase();
+    } else {
+      throw new Error(`ConvertValueToLowercase filter on non string value ${value}`);
+    }
+  }
+
   if (filter.min) {
     typeCheck(typeof value, typeof filter.min);
     if (value < filter.min) {
@@ -41,19 +50,7 @@ export function passesFilter(value: any, filter: Filter): boolean {
     }
   }
   if (filter.includes) {
-    let evaluatedValue = value;
-    let evaluatedIncludes = filter.includes;
-
-    if (filter.convertValueToLowercase) {
-      if (typeof value === 'string') {
-        evaluatedValue = value.toLowerCase();
-      }
-      if (typeof filter.includes === 'string') {
-        evaluatedIncludes = filter.includes.toLowerCase();
-      }
-    }
-
-    if (!evaluatedValue.includes(evaluatedIncludes)) {
+    if (!value.includes(filter.includes)) {
       return false;
     }
   }
