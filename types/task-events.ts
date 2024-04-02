@@ -1,10 +1,10 @@
-import { Address } from "viem";
+import { Address, Hex } from "viem";
 
 import { ERC20Transfer, NativeReward, PreapprovedApplication, RequestType, Reward, SubmissionJudgement, TaskCompletionSource } from "./tasks.js";
 
 export interface TaskEventBase {
   blockNumber: bigint;
-  transactionHash: string;
+  transactionHash: Hex;
   chainId: number;
   address: Address;
 }
@@ -154,19 +154,23 @@ export interface PartialPayment extends TaskEventBase {
 export interface DisputeCreated extends TaskEventBase {
   type: "DisputeCreated";
   dao: Address;
-  dispute: {
+  trustlessActions: Address;
+  actionId: bigint;
+
+  dispute?: {
     taskId: bigint;
     partialNativeReward: bigint[];
     partialReward: bigint[];
   };
-  governancePlugin: Address;
-  proposalId: bigint;
 }
 
 export interface DraftCreated extends TaskEventBase {
   type: "TaskDraftCreated";
   dao: Address;
-  info: {
+  trustlessActions: Address;
+  actionId: bigint;
+
+  info?: {
     metadata: string;
     deadline: bigint;
     manager: Address;
@@ -175,6 +179,4 @@ export interface DraftCreated extends TaskEventBase {
     budget: ERC20Transfer[];
     preapproved: PreapprovedApplication[];
   };
-  governancePlugin: Address;
-  proposalId: bigint;
 }

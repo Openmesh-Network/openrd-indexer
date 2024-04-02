@@ -1,7 +1,7 @@
 import { RFPEvent } from "../types/rfp-events.js";
 import { IndexedRFP } from "../types/rfp.js";
 import { TaskEvent } from "../types/task-events.js";
-import { Dispute, IndexedDraft, IndexedTask } from "../types/tasks.js";
+import { IndexedDispute, IndexedDraft, IndexedTask } from "../types/tasks.js";
 import { User } from "../types/user.js";
 
 export type TaskReturn = IndexedTask;
@@ -30,7 +30,7 @@ export interface TotalUsdValueReturn {
   totalUsdValue: number;
 }
 
-export type DisputesReturn = Dispute[];
+export type DisputesReturn = IndexedDispute[];
 
 export type DraftsReturn = IndexedDraft[];
 

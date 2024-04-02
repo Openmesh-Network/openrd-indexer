@@ -22,7 +22,7 @@ import { watchTaskCompleted } from "./event-watchers/TaskCompleted.js";
 import { watchTaskCreated } from "./event-watchers/TaskCreated.js";
 import { watchTaskTaken } from "./event-watchers/TaskTaken.js";
 import { TaskEvent } from "./types/task-events.js";
-import { Dispute, IndexedDraft, IndexedTask } from "./types/tasks.js";
+import { IndexedDispute, IndexedDraft, IndexedTask } from "./types/tasks.js";
 import { User } from "./types/user.js";
 import { MultischainWatcher } from "./utils/multichain-watcher.js";
 import { PersistentJson } from "./utils/persistent-json.js";
@@ -48,7 +48,7 @@ export interface UsersStorage {
 
 export interface DisputesStorage {
   [chainId: number]: {
-    [taskId: string]: Dispute[];
+    [taskId: string]: IndexedDispute[];
   };
 }
 export interface DraftsStorage {
