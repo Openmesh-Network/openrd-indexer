@@ -4,6 +4,7 @@ export interface Filter {
   equal?: string | number | bigint;
   includes?: string | any;
   oneOf?: Filter[];
+  not?: Filter;
   objectFilter?: ObjectFilter;
 
   convertValueToLowercase?: boolean;
@@ -56,6 +57,11 @@ export function passesFilter(value: any, filter: Filter): boolean {
   }
   if (filter.oneOf) {
     if (!filter.oneOf.some((f) => passesFilter(value, f))) {
+      return false;
+    }
+  }
+  if (filter.not) {
+    if (passesFilter(value, filter.not)) {
       return false;
     }
   }
