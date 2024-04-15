@@ -159,7 +159,7 @@ async function start() {
   const app = express();
   registerRoutes(app, storage);
 
-  var server = app.listen(3001, () => {
+  var server = app.listen(process.env.PORT ?? 3001, () => {
     const addressInfo = server.address() as any;
     var host = addressInfo.address;
     var port = addressInfo.port;
