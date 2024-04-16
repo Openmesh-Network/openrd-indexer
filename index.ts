@@ -2,7 +2,7 @@ import { config as loadEnv } from "dotenv";
 import express from "express";
 import storageManager from "node-persist";
 import { Address } from "viem";
-import { mainnet, polygon, polygonMumbai, sepolia } from "viem/chains";
+import { arbitrumSepolia, mainnet, polygon, sepolia } from "viem/chains";
 
 import { registerRoutes } from "./api/simple-router.js";
 import { watchApplicationAccepted } from "./event-watchers/ApplicationAccepted.js";
@@ -86,19 +86,15 @@ async function start() {
   const multichainWatcher = new MultischainWatcher([
     {
       chain: mainnet,
-      infuraPrefix: "mainnet",
     },
     {
       chain: sepolia,
-      infuraPrefix: "sepolia",
     },
     {
       chain: polygon,
-      infuraPrefix: "polygon-mainnet",
     },
     {
-      chain: polygonMumbai,
-      infuraPrefix: "polygon-mumbai",
+      chain: arbitrumSepolia,
     },
   ]);
 

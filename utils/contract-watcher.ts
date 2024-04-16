@@ -20,28 +20,20 @@ export class ContractWatcher {
     });
   }
 
-  constructor({ chain, httpRPC, websocketRPC }: { chain: Chain; httpRPC: string; websocketRPC: string }) {
-    this.chain = {
-      ...chain,
-      rpcUrls: {
-        default: {
-          http: [httpRPC],
-          webSocket: [websocketRPC],
-        },
-        public: {
-          http: [httpRPC],
-          webSocket: [websocketRPC],
-        },
-      },
-    };
+  constructor({ chain, rpc }: { chain: Chain; rpc: string }) {
+    this.chain = chain;
     this.client = createPublicClient({
       chain: this.chain,
-      transport: webSocket(),
+      transport: webSocket(`wss://${rpc}`),
     });
     this.watching = {};
     setInterval(() => {
       // Wrapped in a function to have the correct "this"
-      this.refresh();
+      try {
+        this.refresh();
+      } catch (err) {
+        console.error(`Refreshing contract watcher ${this.chain.id} error: ${err}`);
+      }
     }, 60 * 60 * 1000); // Start refresh loop to keep connection alive
 
     // Expose this info for other classes to use
