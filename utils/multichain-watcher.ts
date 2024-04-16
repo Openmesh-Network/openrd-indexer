@@ -30,10 +30,6 @@ export class MultischainWatcher {
     switch (chain.id) {
       case 1:
         return "eth.drpc.org";
-      case 137:
-        return "polygon.drpc.org";
-      case 421614:
-        return "arbitrum-sepolia.drpc.org";
       case 11155111:
         return "sepolia.drpc.org";
       default:

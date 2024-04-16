@@ -86,15 +86,19 @@ async function start() {
   const multichainWatcher = new MultischainWatcher([
     {
       chain: mainnet,
+      rpc: `mainnet.infura.io/ws/v3/${process.env.INFURA_API_KEY}`,
     },
     {
       chain: sepolia,
+      rpc: `sepolia.infura.io/ws/v3/${process.env.INFURA_API_KEY}`,
     },
     {
       chain: polygon,
+      rpc: `polygon-mainnet.infura.io/ws/v3/${process.env.INFURA_API_KEY}`,
     },
     {
       chain: arbitrumSepolia,
+      rpc: `arbitrum-sepolia.infura.io/ws/v3/${process.env.INFURA_API_KEY}`,
     },
   ]);
 
