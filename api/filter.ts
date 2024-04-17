@@ -3,6 +3,7 @@ export interface Filter {
   max?: number | bigint;
   equal?: string | number | bigint;
   includes?: string | any;
+  some?: Filter;
   oneOf?: Filter[];
   not?: Filter;
   objectFilter?: ObjectFilter;
@@ -52,6 +53,12 @@ export function passesFilter(value: any, filter: Filter): boolean {
   }
   if (filter.includes) {
     if (!value.includes(filter.includes)) {
+      return false;
+    }
+  }
+  if (filter.some) {
+    const someFilter = filter.some; // To help typescript inference that this is not undefined
+    if (!value.some((v: any) => passesFilter(v, someFilter))) {
       return false;
     }
   }
