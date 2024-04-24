@@ -1,5 +1,5 @@
 export const TasksContract = {
-  address: "0x4436DF92364aBc450AfeC494ED492C2C9D713bc5",
+  address: "0xDdb23dacd41908C4eAE03982B1c6529252A56b62",
   abi: [
     { type: "constructor", inputs: [], stateMutability: "nonpayable" },
     {

@@ -1,5 +1,5 @@
 export const TasksDraftsContract = {
-  address: "0xcA27dDccd950bD201630999B2Dd9CDDA9B429BEC",
+  address: "0x1DC2017f07a1996dA3F093c11570dE038088DCa4",
   abi: [
     {
       type: "constructor",

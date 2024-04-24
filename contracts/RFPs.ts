@@ -1,5 +1,5 @@
 export const RFPsContract = {
-  address: "0x8EB2eDCc549DDb73a3d6114a52936c069bD52400",
+  address: "0x6Fa945AeaA0a5E80F79eff0BC06F0244412A3035",
   abi: [
     {
       type: "constructor",
