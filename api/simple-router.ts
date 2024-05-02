@@ -1,5 +1,5 @@
 import { Express, Response, json } from "express";
-import { isAddress, verifyMessage } from "viem";
+import { isAddress } from "viem";
 
 import { Storage } from "..";
 import { IndexedTask } from "../types/tasks.js";
@@ -8,6 +8,7 @@ import { parseBigInt } from "../utils/parseBigInt.js";
 import { createUserIfNotExists, normalizeAddress } from "../event-watchers/userHelpers.js";
 import { ObjectFilter, passesObjectFilter } from "./filter.js";
 import { fetchMetadata } from "../utils/metadata-fetch.js";
+import { publicClients } from "../utils/chain-cache.js";
 
 function malformedRequest(res: Response, error: string): void {
   res.statusCode = 400;
@@ -188,8 +189,13 @@ export function registerRoutes(app: Express, storage: Storage) {
       const account = req.body.account;
       const metadataUri = req.body.metadata;
       const signature = req.body.signature;
-      const valid = verifyMessage({ address: account, message: `OpenR&D metadata: ${metadataUri}`, signature: signature });
-      if (!valid) {
+      const valid = await Promise.all(
+        Object.values(publicClients).map((publicClient) =>
+          publicClient.verifyMessage({ address: account, message: `OpenR&D metadata: ${metadataUri}`, signature: signature })
+        )
+      );
+      if (!valid.some((b) => b)) {
+        // No single chain that approved this signature
         return malformedRequest(res, "signature is not valid");
       }
 

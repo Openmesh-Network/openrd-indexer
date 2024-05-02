@@ -1,5 +1,5 @@
 import axios from "axios";
-import { Chain, formatUnits, parseAbiItem } from "viem";
+import { Chain, erc20Abi, formatUnits } from "viem";
 
 import { ERC20Transfer } from "../types/tasks.js";
 import { publicClients } from "./chain-cache.js";
@@ -29,12 +29,14 @@ export async function getPrice(chain: Chain, nativeBudget: bigint, budget: ERC20
     const tokens = budget.map((erc20) => normalizeAddress(erc20.tokenContract)).join(",");
     const tokenId = getTokenIdOfChain(chain.id);
     const response = await axios.get(`https://api.coingecko.com/api/v3/simple/token_price/${tokenId}?contract_addresses=${tokens}&vs_currencies=usd`);
-    console.log(response.data);
+    if (response.status !== 200) {
+      console.error("CoingGecko error", response);
+    }
     await Promise.all(
       budget.map(async (erc20) => {
         try {
           const decimals = await publicClients[chain.id].readContract({
-            abi: [parseAbiItem("function decimals() view returns (uint8)")],
+            abi: erc20Abi,
             address: erc20.tokenContract,
             functionName: "decimals",
           });
