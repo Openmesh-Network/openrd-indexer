@@ -1,4 +1,4 @@
-import { Storage } from "..";
+import { Storage } from "../types/storage.js";
 import { TasksContract } from "../contracts/Tasks.js";
 import { TaskCancelled } from "../types/task-events.js";
 import { TaskState } from "../types/tasks.js";

@@ -1,6 +1,6 @@
 import { parseAbiItem } from "viem";
 
-import { Storage } from "..";
+import { Storage } from "../types/storage.js";
 import { TasksContract } from "../contracts/Tasks.js";
 import { BudgetChanged } from "../types/task-events.js";
 import { publicClients } from "../utils/chain-cache.js";

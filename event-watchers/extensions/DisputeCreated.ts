@@ -1,5 +1,5 @@
 import { decodeEventLog, decodeFunctionData } from "viem";
-import { Storage } from "../..";
+import { Storage } from "../../types/storage.js";
 import { TasksContract } from "../../contracts/Tasks.js";
 import { TasksDisputesContract } from "../../contracts/TasksDisputes.js";
 import { TrustlessActionsContract } from "../../contracts/TrustlessActions.js";
@@ -7,9 +7,9 @@ import { DisputeCreated } from "../../types/task-events.js";
 import { publicClients } from "../../utils/chain-cache.js";
 import { ContractWatcher } from "../../utils/contract-watcher.js";
 import { addEvent, createTaskIfNotExists } from "../taskHelpers.js";
-import { normalizeAddress } from "../userHelpers.js";
 import { createDisputeTaskIfNotExists } from "./disputeHelpers.js";
 import { fetchMetadata } from "../../utils/metadata-fetch.js";
+import { normalizeAddress } from "../../utils/normalize-address.js";
 
 export function watchDisputeCreated(contractWatcher: ContractWatcher, storage: Storage) {
   contractWatcher.startWatching("DisputeCreated", {

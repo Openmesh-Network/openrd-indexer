@@ -1,6 +1,6 @@
 import { parseAbiItem } from "viem";
 
-import { Storage } from "../..";
+import { Storage } from "../../types/storage.js";
 import { ContractWatcher } from "../../utils/contract-watcher.js";
 import { fetchMetadata } from "../../utils/metadata-fetch.js";
 import { getPrice } from "../../utils/get-token-price.js";

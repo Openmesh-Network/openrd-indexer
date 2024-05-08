@@ -3,7 +3,7 @@ import { Chain, erc20Abi, formatUnits } from "viem";
 
 import { ERC20Transfer } from "../types/tasks.js";
 import { publicClients } from "./chain-cache.js";
-import { normalizeAddress } from "../event-watchers/userHelpers.js";
+import { normalizeAddress } from "./normalize-address.js";
 
 export async function getPrice(chain: Chain, nativeBudget: bigint, budget: ERC20Transfer[]): Promise<number> {
   // Example native MATIC: https://api.coingecko.com/api/v3/simple/price?ids=matic-network&vs_currencies=usd

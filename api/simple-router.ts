@@ -1,14 +1,15 @@
 import { Express, Response, json } from "express";
 import { isAddress } from "viem";
 
-import { Storage } from "..";
+import { Storage } from "../types/storage.js";
 import { IndexedTask } from "../types/tasks.js";
 import { replacer, reviver } from "../utils/json.js";
 import { parseBigInt } from "../utils/parseBigInt.js";
-import { createUserIfNotExists, normalizeAddress } from "../event-watchers/userHelpers.js";
+import { createUserIfNotExists } from "../event-watchers/userHelpers.js";
 import { ObjectFilter, passesObjectFilter } from "./filter.js";
 import { fetchMetadata } from "../utils/metadata-fetch.js";
 import { publicClients } from "../utils/chain-cache.js";
+import { normalizeAddress } from "../utils/normalize-address.js";
 
 function malformedRequest(res: Response, error: string): void {
   res.statusCode = 400;

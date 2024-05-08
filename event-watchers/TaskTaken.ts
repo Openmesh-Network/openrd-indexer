@@ -1,11 +1,12 @@
-import { Storage } from "..";
+import { Storage } from "../types/storage.js";
 import { TasksContract } from "../contracts/Tasks.js";
 import { TaskTaken } from "../types/task-events.js";
 import { TaskState } from "../types/tasks.js";
 import { TaskRole } from "../types/user.js";
 import { ContractWatcher } from "../utils/contract-watcher.js";
+import { normalizeAddress } from "../utils/normalize-address.js";
 import { addEvent, createApplicationIfNotExists } from "./taskHelpers.js";
-import { createUserTaskIfNotExists, normalizeAddress } from "./userHelpers.js";
+import { createUserTaskIfNotExists } from "./userHelpers.js";
 
 export function watchTaskTaken(contractWatcher: ContractWatcher, storage: Storage) {
   contractWatcher.startWatching("TaskTaken", {

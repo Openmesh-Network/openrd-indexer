@@ -1,5 +1,5 @@
 import { zeroAddress } from "viem";
-import { RFPsStorage } from "../..";
+import { RFPsStorage } from "../../types/storage.js";
 
 export function createChainIfNotExists(rfps: RFPsStorage, chainId: number): void {
   if (!rfps[chainId]) {

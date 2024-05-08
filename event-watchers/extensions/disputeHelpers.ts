@@ -1,4 +1,4 @@
-import { DisputesStorage } from "../..";
+import { DisputesStorage } from "../../types/storage.js";
 
 export function createDisputeNetworkIfNotExists(disputes: DisputesStorage, chainId: number): void {
   if (!disputes[chainId]) {

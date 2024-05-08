@@ -1,6 +1,6 @@
 import { parseAbiItem } from "viem";
 
-import { Storage } from "../..";
+import { Storage } from "../../types/storage.js";
 import { ContractWatcher } from "../../utils/contract-watcher.js";
 import { publicClients } from "../../utils/chain-cache.js";
 import { RFPsContract } from "../../contracts/RFPs.js";

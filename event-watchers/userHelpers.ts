@@ -1,6 +1,6 @@
 import { Address } from "viem";
 
-import { UsersStorage } from "..";
+import { UsersStorage } from "../types/storage.js";
 
 export function createUserIfNotExists(users: UsersStorage, userAddress: Address): void {
   if (!users[userAddress]) {
@@ -27,8 +27,4 @@ export function createUserTaskIfNotExists(users: UsersStorage, userAddress: Addr
   if (!users[userAddress].tasks[chainId][taskId]) {
     users[userAddress].tasks[chainId][taskId] = [];
   }
-}
-
-export function normalizeAddress(address: Address): Address {
-  return address.toLowerCase() as Address;
 }

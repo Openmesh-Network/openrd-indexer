@@ -1,6 +1,6 @@
 import { zeroAddress } from "viem";
 
-import { TasksStorage } from "..";
+import { TasksStorage } from "../types/storage.js";
 import { IndexedTask, Request, RequestType, SubmissionJudgement, TaskState } from "../types/tasks.js";
 
 export function createNetworkIfNotExists(tasks: TasksStorage, chainId: number): void {

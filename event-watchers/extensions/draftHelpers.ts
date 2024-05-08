@@ -1,5 +1,5 @@
 import { Address } from "viem";
-import { DraftsStorage } from "../..";
+import { DraftsStorage } from "../../types/storage.js";
 
 export function createDraftNetworkIfNotExists(drafts: DraftsStorage, chainId: number): void {
   if (!drafts[chainId]) {

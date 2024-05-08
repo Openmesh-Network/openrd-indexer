@@ -1,5 +1,5 @@
 import { decodeEventLog, decodeFunctionData } from "viem";
-import { Storage } from "../..";
+import { Storage } from "../../types/storage.js";
 import { TasksContract } from "../../contracts/Tasks.js";
 import { TasksDraftsContract } from "../../contracts/TasksDrafts.js";
 import { TrustlessActionsContract } from "../../contracts/TrustlessActions.js";
@@ -7,8 +7,8 @@ import { DraftCreated } from "../../types/task-events.js";
 import { publicClients } from "../../utils/chain-cache.js";
 import { ContractWatcher } from "../../utils/contract-watcher.js";
 import { fetchMetadata } from "../../utils/metadata-fetch.js";
-import { normalizeAddress } from "../userHelpers.js";
 import { createDraftDAOIfNotExists } from "./draftHelpers.js";
+import { normalizeAddress } from "../../utils/normalize-address.js";
 
 export function watchDraftCreated(contractWatcher: ContractWatcher, storage: Storage) {
   contractWatcher.startWatching("DraftCreated", {
