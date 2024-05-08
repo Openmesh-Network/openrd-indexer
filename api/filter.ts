@@ -33,46 +33,46 @@ export function passesFilter(value: any, filter: Filter): boolean {
     }
   }
 
-  if (filter.min) {
+  if (filter.min !== undefined) {
     typeCheck(typeof value, typeof filter.min);
     if (value < filter.min) {
       return false;
     }
   }
-  if (filter.max) {
+  if (filter.max !== undefined) {
     typeCheck(typeof value, typeof filter.max);
     if (value > filter.max) {
       return false;
     }
   }
-  if (filter.equal) {
+  if (filter.equal !== undefined) {
     typeCheck(typeof value, typeof filter.equal);
     if (value !== filter.equal) {
       return false;
     }
   }
-  if (filter.includes) {
+  if (filter.includes !== undefined) {
     if (!value.includes(filter.includes)) {
       return false;
     }
   }
-  if (filter.some) {
+  if (filter.some !== undefined) {
     const someFilter = filter.some; // To help typescript inference that this is not undefined
     if (!value.some((v: any) => passesFilter(v, someFilter))) {
       return false;
     }
   }
-  if (filter.oneOf) {
+  if (filter.oneOf !== undefined) {
     if (!filter.oneOf.some((f) => passesFilter(value, f))) {
       return false;
     }
   }
-  if (filter.not) {
+  if (filter.not !== undefined) {
     if (passesFilter(value, filter.not)) {
       return false;
     }
   }
-  if (filter.objectFilter) {
+  if (filter.objectFilter !== undefined) {
     return passesObjectFilter(value, filter.objectFilter);
   }
 
