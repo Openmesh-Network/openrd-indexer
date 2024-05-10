@@ -1,7 +1,7 @@
 import { decodeEventLog, decodeFunctionData } from "viem";
 import { Storage } from "../../types/storage.js";
 import { TasksContract } from "../../contracts/Tasks.js";
-import { TasksDraftsContract } from "../../contracts/TasksDrafts.js";
+import { TaskDraftsContract } from "../../contracts/TaskDrafts.js";
 import { TrustlessActionsContract } from "../../contracts/TrustlessActions.js";
 import { DraftCreated } from "../../types/task-events.js";
 import { publicClients } from "../../utils/chain-cache.js";
@@ -12,8 +12,8 @@ import { normalizeAddress } from "../../utils/normalize-address.js";
 
 export function watchDraftCreated(contractWatcher: ContractWatcher, storage: Storage) {
   contractWatcher.startWatching("DraftCreated", {
-    abi: TasksDraftsContract.abi,
-    address: TasksDraftsContract.address,
+    abi: TaskDraftsContract.abi,
+    address: TaskDraftsContract.address,
     eventName: "TrustlessActionCreated",
     strict: true,
     onLogs: async (logs) => {

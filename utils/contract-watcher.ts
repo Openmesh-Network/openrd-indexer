@@ -1,12 +1,14 @@
-import { Abi, Chain, ContractEventName, createPublicClient, PublicClient, WatchContractEventParameters, webSocket } from "viem";
+import { Abi, Chain, ContractEventName, createPublicClient, decodeEventLog, Log, PublicClient, WatchContractEventParameters, webSocket } from "viem";
 
 import { chains, publicClients } from "./chain-cache.js";
+import { normalizeAddress } from "./normalize-address.js";
+import { removeUndefined } from "./remove-undefined.js";
 
 export class ContractWatcher {
   public chain: Chain;
   private client: PublicClient;
   private watching: {
-    [watchId: string]: { start: () => void; stop: () => void };
+    [watchId: string]: { start: () => void; stop: () => void; tryProcess: (logs: Log[]) => void };
   };
 
   public getWatched(): string[] {
@@ -62,9 +64,40 @@ export class ContractWatcher {
         });
       },
       stop: () => {},
+      tryProcess: (logs) => {
+        const decodedLogs = removeUndefined(
+          logs
+            .filter(
+              (log) =>
+                parameters.address === undefined ||
+                (typeof parameters.address === "string" && normalizeAddress(log.address) === normalizeAddress(parameters.address)) ||
+                (parameters.address instanceof Array && parameters.address.some((address) => normalizeAddress(log.address) === normalizeAddress(address)))
+            )
+            .map((log) => {
+              try {
+                return {
+                  ...log,
+                  ...decodeEventLog({
+                    abi: parameters.abi,
+                    eventName: parameters.eventName,
+                    strict: parameters.strict,
+                    topics: log.topics,
+                    data: log.data,
+                  }),
+                };
+              } catch {}
+            })
+        ).filter((log) => !parameters.eventName || log.eventName === parameters.eventName); // For some reason wagmi decode event log also decodes different events
+
+        parameters.onLogs(decodedLogs as any);
+      },
     };
 
     this.watching[watchId].start();
+  }
+
+  public processLogs(logs: Log[]): void {
+    Object.values(this.watching).forEach((watcher) => watcher.tryProcess(logs));
   }
 
   public stopWatching(watchId: string): void {

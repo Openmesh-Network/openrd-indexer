@@ -1,4 +1,4 @@
-import { Chain } from "viem";
+import { Chain, Log } from "viem";
 
 import { ContractWatcher } from "./contract-watcher.js";
 
@@ -7,7 +7,7 @@ export interface ChainWatchInfo {
   rpc?: string;
 }
 
-export class MultischainWatcher {
+export class MultichainWatcher {
   private chainWatchers: {
     [chainId: number]: ContractWatcher;
   };
@@ -22,8 +22,17 @@ export class MultischainWatcher {
     }, {} as typeof this.chainWatchers);
   }
 
-  public forEach(fn: (contractWatcher: ContractWatcher) => void) {
+  public forEach(fn: (contractWatcher: ContractWatcher) => void): void {
     Object.values(this.chainWatchers).forEach(fn);
+  }
+
+  public processLogs(chainId: number, logs: Log[]): void {
+    const chainWatcher = this.chainWatchers[chainId];
+    if (chainWatcher === undefined) {
+      return;
+    }
+
+    chainWatcher.processLogs(logs);
   }
 
   private getRPC(chain: Chain): string {

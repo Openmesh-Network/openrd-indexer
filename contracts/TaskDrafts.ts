@@ -1,4 +1,4 @@
-export const TasksDraftsContract = {
+export const TaskDraftsContract = {
   address: "0x1DC2017f07a1996dA3F093c11570dE038088DCa4",
   abi: [
     {

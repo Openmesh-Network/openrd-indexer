@@ -101,8 +101,10 @@ export function registerRoutes(app: Express, storage: Storage) {
             ...taskInfo,
             ...tasks[taskInfo.chainId][taskInfo.taskId.toString()],
           };
-          if (filter.cachedMetadata) {
+          try {
             task.cachedMetadata = JSON.parse(task.cachedMetadata, reviver);
+          } catch {
+            task.cachedMetadata = {} as any; // cachedMetadata should be an object for filtering
           }
           return passesObjectFilter(task, filter);
         })

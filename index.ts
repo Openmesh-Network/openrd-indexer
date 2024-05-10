@@ -20,7 +20,7 @@ import { watchTaskCancelled } from "./event-watchers/TaskCancelled.js";
 import { watchTaskCompleted } from "./event-watchers/TaskCompleted.js";
 import { watchTaskCreated } from "./event-watchers/TaskCreated.js";
 import { watchTaskTaken } from "./event-watchers/TaskTaken.js";
-import { MultischainWatcher } from "./utils/multichain-watcher.js";
+import { MultichainWatcher } from "./utils/multichain-watcher.js";
 import { PersistentJson } from "./utils/persistent-json.js";
 import { watchRewardIncreased } from "./event-watchers/RewardIncreased.js";
 import { watchDisputeCreated } from "./event-watchers/extensions/DisputeCreated.js";
@@ -30,6 +30,10 @@ import { watchRFPEmptied } from "./event-watchers/rfps/RFPEmptied.js";
 import { watchProjectSubmitted } from "./event-watchers/rfps/ProjectSubmitted.js";
 import { watchProjectAccepted } from "./event-watchers/rfps/ProjectAccepted.js";
 import { DisputesStorage, DraftsStorage, RFPsEventsStorage, RFPsStorage, TasksEventsStorage, TasksStorage, UsersStorage } from "./types/storage.js";
+import { historySync } from "./utils/history-sync.js";
+import axios from "axios";
+import { UserReturn } from "./api/return-types.js";
+import { Address } from "viem";
 
 async function start() {
   const loadEnvResult = loadEnv();
@@ -38,7 +42,7 @@ async function start() {
   }
 
   // Make contract watcher for each chain (using Infura provider)
-  const multichainWatcher = new MultischainWatcher([
+  const multichainWatcher = new MultichainWatcher([
     {
       chain: mainnet,
       rpc: `mainnet.infura.io/ws/v3/${process.env.INFURA_API_KEY}`,
@@ -119,6 +123,67 @@ async function start() {
     var host = addressInfo.address;
     var port = addressInfo.port;
     console.log(`Webserver started on ${host}:${port}`);
+  });
+
+  process.stdin.resume();
+
+  process.stdin.on("data", (input) => {
+    try {
+      const command = input.toString();
+      if (command.startsWith("sync ")) {
+        // In case some event logs were missed
+        const args = command.split(" ").slice(1);
+        const chainId = Number(args[0]);
+        const fromBlock = BigInt(args[1]);
+        const toBlock = BigInt(args[2]);
+        historySync(multichainWatcher, chainId, fromBlock, toBlock).catch((err) => console.error(`Error while executing history sync: ${err}`));
+      }
+      if (command.startsWith("setUSD ")) {
+        // In case the current USD value is not representative (weird price spike)
+        const args = command.split(" ").slice(1);
+        const chainId = Number(args[0]);
+        const taskId = BigInt(args[1]).toString();
+        const usdValue = Number(args[2]);
+        storage.tasks
+          .update((tasks) => {
+            console.log(Number((tasks[chainId][taskId].budget.at(0)?.amount ?? BigInt(0)) / BigInt(10) ** BigInt(6)));
+            tasks[chainId][taskId].usdValue = Number((tasks[chainId][taskId].budget.at(0)?.amount ?? BigInt(0)) / BigInt(10) ** BigInt(6));
+          })
+          .catch((err) => console.error(`Error while executing set USD: ${err}`));
+      }
+      if (command.startsWith("syncUserMetadata")) {
+        // Download user metadata from remote
+        const remote = "https://openrd.plopmenz.com/indexer/user/";
+        storage.users
+          .get()
+          .then(async (users) => {
+            const addresses = Object.keys(users);
+            const metadata = await Promise.all(
+              addresses.map((address) =>
+                axios
+                  .get(remote + address)
+                  .then((response) => response.data as UserReturn)
+                  .then((user) => user.metadata)
+                  .catch(() => "")
+              )
+            );
+            return {
+              addresses: addresses,
+              metadata: metadata,
+            };
+          })
+          .then(async (userInfo) => {
+            await storage.users.update((users) => {
+              for (let i = 0; i < userInfo.addresses.length; i++) {
+                users[userInfo.addresses[i] as Address].metadata = userInfo.metadata[i];
+              }
+            });
+          })
+          .catch((err) => console.error(`Error while executing user metadata sync: ${err}`));
+      }
+    } catch (err) {
+      console.error(`Error interpreting command: ${err}`);
+    }
   });
 }
 
