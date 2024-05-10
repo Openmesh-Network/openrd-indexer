@@ -146,8 +146,7 @@ async function start() {
         const usdValue = Number(args[2]);
         storage.tasks
           .update((tasks) => {
-            console.log(Number((tasks[chainId][taskId].budget.at(0)?.amount ?? BigInt(0)) / BigInt(10) ** BigInt(6)));
-            tasks[chainId][taskId].usdValue = Number((tasks[chainId][taskId].budget.at(0)?.amount ?? BigInt(0)) / BigInt(10) ** BigInt(6));
+            tasks[chainId][taskId].usdValue = usdValue;
           })
           .catch((err) => console.error(`Error while executing set USD: ${err}`));
       }
