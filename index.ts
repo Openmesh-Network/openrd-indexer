@@ -158,23 +158,23 @@ async function start() {
           .then(async (users) => {
             const addresses = Object.keys(users);
             const metadata = await Promise.all(
-              addresses.map((address) =>
-                axios
-                  .get(remote + address)
-                  .then((response) => response.data as UserReturn)
-                  .then((user) => user.metadata)
-                  .catch(() => "")
+              addresses.map(
+                (address) =>
+                  axios
+                    .get(remote + address)
+                    .then((response) => response.data as UserReturn)
+                    .then((user) => user.metadata)
+                    .catch(() => "") // Assumed user not found error, meaning they have no metadata
               )
             );
-            return {
-              addresses: addresses,
-              metadata: metadata,
-            };
+            return addresses.map((address, i) => {
+              return { address: address as Address, metadata: metadata[i] };
+            });
           })
           .then(async (userInfo) => {
             await storage.users.update((users) => {
-              for (let i = 0; i < userInfo.addresses.length; i++) {
-                users[userInfo.addresses[i] as Address].metadata = userInfo.metadata[i];
+              for (let i = 0; i < userInfo.length; i++) {
+                users[userInfo[i].address].metadata = userInfo[i].metadata;
               }
             });
           })

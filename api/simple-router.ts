@@ -314,6 +314,42 @@ export function registerRoutes(app: Express, storage: Storage) {
     res.end(JSON.stringify(event, replacer));
   });
 
+  // Get all tasks that pass a certain filter
+  app.post(basePath + "filterRFPs", async function (req, res) {
+    try {
+      const filter: ObjectFilter = JSON.parse(JSON.stringify(req.body), reviver);
+
+      const rfps = await storage.rfps.get();
+      const filterRFPs = Object.keys(rfps)
+        .map((chainId) =>
+          Object.keys(rfps[chainId as any as number]).map((rfpId) => {
+            return { chainId: parseInt(chainId), rfpId: BigInt(rfpId) };
+          })
+        )
+        .flat(1)
+        .filter((rfpInfo) => {
+          const rfp = {
+            ...rfpInfo,
+            ...rfps[rfpInfo.chainId][rfpInfo.rfpId.toString()],
+          };
+          try {
+            rfp.cachedMetadata = JSON.parse(rfp.cachedMetadata, reviver);
+          } catch {
+            rfp.cachedMetadata = {} as any; // cachedMetadata should be an object for filtering
+          }
+          return passesObjectFilter(rfp, filter);
+        })
+        .sort(
+          (rfpInfo1, rfpInfo2) => rfps[rfpInfo2.chainId][rfpInfo2.rfpId.toString()].lastUpdated - rfps[rfpInfo1.chainId][rfpInfo1.rfpId.toString()].lastUpdated
+        );
+
+      res.end(JSON.stringify(filterRFPs, replacer));
+    } catch (error: any) {
+      res.statusCode = 500;
+      res.end(JSON.stringify({ error: error?.message ?? "Unknown error" }));
+    }
+  });
+
   // Get total rfp count
   app.get(basePath + "totalRFPs", async function (_, res) {
     const rfps = await storage.rfps.get();
