@@ -24,11 +24,12 @@ export interface RFP {
   tasksManager: Address;
   disputeManager: Address;
   manager: Address;
-  budget: ERC20Transfer[];
+  budget: { tokenContract: Address }[];
   projects: { [projectId: number]: Project };
 }
 
 export interface IndexedRFP extends RFP {
+  budget: ERC20Transfer[];
   projects: { [projectId: number]: IndexedProject };
 
   createdAt: number;
