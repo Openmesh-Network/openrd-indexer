@@ -53,7 +53,11 @@ export async function processRFPCreated(event: RFPCreated, storage: Storage): Pr
     rfp.tasksManager = event.tasksManager;
     rfp.disputeManager = event.disputeManager;
     rfp.manager = event.manager;
-    rfp.budget = [...event.budget];
+    rfp.budget = event.budget.map((b) => {
+      return {
+        tokenContract: b.tokenContract,
+      };
+    });
 
     rfp.events.push(rfpEvent);
   });

@@ -1,5 +1,5 @@
 import { Address } from "viem";
-import { ERC20Transfer, NativeReward, Reward } from "./tasks.js";
+import { NativeReward, Reward } from "./tasks.js";
 
 export interface Project {
   metadata: string;
@@ -29,7 +29,6 @@ export interface RFP {
 }
 
 export interface IndexedRFP extends RFP {
-  budget: ERC20Transfer[];
   projects: { [projectId: number]: IndexedProject };
 
   createdAt: number;
