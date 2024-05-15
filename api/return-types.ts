@@ -40,7 +40,7 @@ export type RFPEventReturn = RFPEvent;
 
 export type UserRFPEventsReturn = number[];
 
-export type FilterRFPsReturn = { chainId: number; taskId: bigint }[];
+export type FilterRFPsReturn = { chainId: number; rfpId: bigint }[];
 
 export interface TotalRFPsReturn {
   totalRFPs: number;
