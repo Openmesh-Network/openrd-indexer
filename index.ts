@@ -167,6 +167,7 @@ async function start() {
       if (command.startsWith("syncUserMetadata")) {
         // Download user metadata from remote
         const remote = "https://openrd.plopmenz.com/indexer/user/";
+        console.log(`Syncing user metadata from ${remote}...`);
         storage.users
           .get()
           .then(async (users) => {
@@ -192,6 +193,7 @@ async function start() {
               }
             });
           })
+          .then(() => console.log("Sync finished!"))
           .catch((err) => console.error(`Error while executing user metadata sync: ${err}`));
       }
     } catch (err) {

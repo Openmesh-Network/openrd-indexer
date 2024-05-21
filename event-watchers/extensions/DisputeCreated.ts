@@ -97,8 +97,13 @@ export async function proccessDisputeCreated(event: DisputeCreated, storage: Sto
   }
 
   const taskId = dispute.args[0].toString();
-  const partialNativeReward = dispute.args[1];
-  const partialReward = dispute.args[2];
+  const partialNativeReward = [...dispute.args[1]];
+  const partialReward = [...dispute.args[2]];
+  event.dispute = {
+    partialNativeReward: partialNativeReward,
+    partialReward: partialReward,
+    taskId: BigInt(taskId),
+  };
   await storage.tasks.update((tasks) => {
     createTaskIfNotExists(tasks, event.chainId, taskId);
     const task = tasks[event.chainId][taskId];
@@ -113,8 +118,8 @@ export async function proccessDisputeCreated(event: DisputeCreated, storage: Sto
     createDisputeTaskIfNotExists(disputes, event.chainId, taskId);
     disputeIndex =
       disputes[event.chainId][taskId].push({
-        partialNativeReward: [...partialNativeReward],
-        partialReward: [...partialReward],
+        partialNativeReward: partialNativeReward,
+        partialReward: partialReward,
 
         trustlessActions: event.trustlessActions,
         actionId: event.actionId,

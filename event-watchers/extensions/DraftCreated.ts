@@ -100,8 +100,23 @@ export async function proccessDraftCreated(event: DraftCreated, storage: Storage
   const manager = draft.args[2];
   const disputeManager = draft.args[3];
   const nativeBudget = draftAction.value;
-  const budget = draft.args[4];
-  const preapproved = draft.args[5];
+  const budget = [...draft.args[4]];
+  const preapproved = draft.args[5].map((preapproved) => {
+    return {
+      ...preapproved,
+      nativeReward: [...preapproved.nativeReward],
+      reward: [...preapproved.reward],
+    };
+  });
+  event.info = {
+    budget: budget,
+    deadline: deadline,
+    disputeManager: disputeManager,
+    manager: manager,
+    metadata: metadata,
+    nativeBudget: nativeBudget,
+    preapproved: preapproved,
+  };
 
   let draftIndex: number;
   const dao = normalizeAddress(event.dao);
@@ -114,14 +129,8 @@ export async function proccessDraftCreated(event: DraftCreated, storage: Storage
         manager: manager,
         disputeManager: disputeManager,
         nativeBudget: nativeBudget,
-        budget: [...budget],
-        preapproved: preapproved.map((preapproved) => {
-          return {
-            ...preapproved,
-            nativeReward: [...preapproved.nativeReward],
-            reward: [...preapproved.reward],
-          };
-        }),
+        budget: budget,
+        preapproved: preapproved,
 
         trustlessActions: event.trustlessActions,
         actionId: event.actionId,
