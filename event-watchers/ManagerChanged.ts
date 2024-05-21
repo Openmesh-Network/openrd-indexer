@@ -37,10 +37,18 @@ export function watchManagerChanged(contractWatcher: ContractWatcher, storage: S
 }
 
 export async function processManagerChanged(event: ManagerChanged, storage: Storage): Promise<void> {
+  let alreadyProcessed = false;
   let taskEvent: number;
   await storage.tasksEvents.update((tasksEvents) => {
+    if (tasksEvents.some((e) => e.transactionHash === event.transactionHash)) {
+      alreadyProcessed = true;
+      return;
+    }
     taskEvent = tasksEvents.push(event) - 1;
   });
+  if (alreadyProcessed) {
+    return;
+  }
 
   let oldManager: Address;
   const taskId = event.taskId.toString();

@@ -33,10 +33,18 @@ export function watchProjectSubmitted(contractWatcher: ContractWatcher, storage:
 }
 
 export async function processProjectSubmitted(event: ProjectSubmitted, storage: Storage): Promise<void> {
+  let alreadyProcessed = false;
   let rfpEvent: number;
   await storage.rfpsEvents.update((rfpsEvents) => {
+    if (rfpsEvents.some((e) => e.transactionHash === event.transactionHash)) {
+      alreadyProcessed = true;
+      return;
+    }
     rfpEvent = rfpsEvents.push(event) - 1;
   });
+  if (alreadyProcessed) {
+    return;
+  }
 
   const rfpId = event.rfpId.toString();
   await storage.rfps.update((rfps) => {

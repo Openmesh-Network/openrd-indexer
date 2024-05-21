@@ -33,10 +33,18 @@ export function watchSubmissionCreated(contractWatcher: ContractWatcher, storage
 }
 
 export async function processSubmissionCreated(event: SubmissionCreated, storage: Storage): Promise<void> {
+  let alreadyProcessed = false;
   let taskEvent: number;
   await storage.tasksEvents.update((tasksEvents) => {
+    if (tasksEvents.some((e) => e.transactionHash === event.transactionHash)) {
+      alreadyProcessed = true;
+      return;
+    }
     taskEvent = tasksEvents.push(event) - 1;
   });
+  if (alreadyProcessed) {
+    return;
+  }
 
   const taskId = event.taskId.toString();
   await storage.tasks.update((tasks) => {
