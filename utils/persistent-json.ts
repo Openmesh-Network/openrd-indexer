@@ -16,7 +16,11 @@ export class PersistentJson<T> {
   public async get(): Promise<T> {
     if (this.value === undefined) {
       const storedValue = await storage.getItem(this.storageKey);
-      this.value = storedValue ? (JSON.parse(storedValue, reviver) as T) : this.defaultValue;
+      if (this.value === undefined) {
+        // Could have been loaded by someone else in the meanwhile
+        // Default value is return directly, meaning that is might be altered (currently not an issue)
+        this.value = storedValue ? (JSON.parse(storedValue, reviver) as T) : this.defaultValue;
+      }
     }
 
     return this.value;

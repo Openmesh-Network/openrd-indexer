@@ -117,7 +117,7 @@ async function start() {
     });
     await Promise.all(
       Object.values(storage).map((storageItem) => {
-        storageItem.update(() => {}); // Save all memory values to disk
+        return storageItem.update(() => {}); // Save all memory values to disk
       })
     );
     process.exit();
