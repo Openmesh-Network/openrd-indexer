@@ -1,12 +1,8 @@
-import { createPublicClient, http } from "viem";
+import { Address, createPublicClient, http } from "viem";
 import { MultichainWatcher } from "./multichain-watcher.js";
-import { TasksContract } from "../contracts/Tasks.js";
-import { RFPsContract } from "../contracts/RFPs.js";
-import { TaskDisputesContract } from "../contracts/TaskDisputes.js";
-import { TaskDraftsContract } from "../contracts/TaskDrafts.js";
 
 /// Sync history of missed events between certain blocks
-export async function historySync(watcher: MultichainWatcher, chainId: number, fromBlock: bigint, toBlock: bigint): Promise<void> {
+export async function historySync(watcher: MultichainWatcher, chainId: number, fromBlock: bigint, toBlock: bigint, addresses: Address[]): Promise<void> {
   const rpc = getSyncRPC(chainId);
   const publicClient = createPublicClient({
     transport: http(rpc),
@@ -22,7 +18,7 @@ export async function historySync(watcher: MultichainWatcher, chainId: number, f
   for (let i = 1; i < ranges.length; i++) {
     console.log(`Getting logs from blocks ${ranges[i - 1]} to ${ranges[i]}...`);
     const logs = await publicClient.getLogs({
-      address: [TasksContract.address, RFPsContract.address, TaskDisputesContract.address, TaskDraftsContract.address],
+      address: addresses,
       fromBlock: ranges[i - 1],
       toBlock: ranges[i],
     });

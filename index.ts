@@ -34,6 +34,10 @@ import { historySync } from "./utils/history-sync.js";
 import axios from "axios";
 import { UserReturn } from "./api/return-types.js";
 import { Address } from "viem";
+import { TasksContract } from "./contracts/Tasks.js";
+import { RFPsContract } from "./contracts/RFPs.js";
+import { TaskDisputesContract } from "./contracts/TaskDisputes.js";
+import { TaskDraftsContract } from "./contracts/TaskDrafts.js";
 
 async function start() {
   const loadEnvResult = loadEnv();
@@ -141,7 +145,12 @@ async function start() {
         const chainId = Number(args[0]);
         const fromBlock = BigInt(args[1]);
         const toBlock = BigInt(args[2]);
-        historySync(multichainWatcher, chainId, fromBlock, toBlock).catch((err) => console.error(`Error while executing history sync: ${err}`));
+        historySync(multichainWatcher, chainId, fromBlock, toBlock, [
+          TasksContract.address,
+          RFPsContract.address,
+          TaskDisputesContract.address,
+          TaskDraftsContract.address,
+        ]).catch((err) => console.error(`Error while executing history sync: ${err}`));
       }
       if (command.startsWith("setUSD ")) {
         // In case the current USD value is not representative (weird price spike)
