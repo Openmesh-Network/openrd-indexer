@@ -60,7 +60,7 @@ export async function processSubmissionReviewed(event: SubmissionReviewed, stora
   await fetchMetadata(event.feedback)
     .then((metadata) =>
       storage.tasks.update((tasks) => {
-        tasks[event.chainId][taskId].submissions[event.submissionId].cachedMetadata = metadata;
+        tasks[event.chainId][taskId].submissions[event.submissionId].cachedFeedback = metadata;
       })
     )
     .catch((err) => console.error(`Error while fetching application feedback metadata ${event.feedback} (${event.chainId}-${taskId}): ${err}`));
