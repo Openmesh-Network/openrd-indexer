@@ -109,7 +109,13 @@ async function start() {
     watchRFPEmptied(contractWatcher, storage);
   });
 
+  let isStopping = false;
   process.on("SIGINT", async () => {
+    if (isStopping) {
+      // Sigint can be fired multiple times
+      return;
+    }
+    isStopping = true;
     console.log("Stopping...");
 
     multichainWatcher.forEach((contractWatcher) => {
