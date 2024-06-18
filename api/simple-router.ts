@@ -141,11 +141,11 @@ export function registerRoutes(app: Express, storage: Storage) {
           return {
             ...taskInfo,
             lastUpdated: tasks[taskInfo.chainId][taskInfo.taskId.toString()].events
-              .map((event) => tasksEvents[event.chainId]?.[event.transactionHash]?.[event.logIndex].timestamp)
+              .map((event) => tasksEvents[event.chainId]?.[event.transactionHash]?.[event.logIndex]?.timestamp ?? BigInt(0))
               .reduce((prev, cur) => (cur > prev ? cur : prev), BigInt(0)),
           };
         })
-        .sort((taskInfo1, taskInfo2) => Number(taskInfo1.lastUpdated - taskInfo2.lastUpdated));
+        .sort((taskInfo1, taskInfo2) => Number(taskInfo2.lastUpdated - taskInfo1.lastUpdated));
 
       res.end(JSON.stringify(filterTasks as FilterTasksReturn, replacer));
     } catch (error: any) {
@@ -163,6 +163,7 @@ export function registerRoutes(app: Express, storage: Storage) {
 
     const users = await storage.users.get();
     const tasks = await storage.tasks.get();
+    const tasksEvents = await storage.tasksEvents.get();
     const user = users[normalizeAddress(address)];
 
     if (!user) {
@@ -177,7 +178,10 @@ export function registerRoutes(app: Express, storage: Storage) {
         })
       )
       .flat(1)
-      .flatMap((taskInfo) => tasks[taskInfo.chainId][taskInfo.taskId.toString()].events);
+      .flatMap((taskInfo) => tasks[taskInfo.chainId][taskInfo.taskId.toString()].events)
+      .toSorted((e1, e2) =>
+        Number(tasksEvents[e2.chainId][e2.transactionHash][e2.logIndex].timestamp - tasksEvents[e1.chainId][e1.transactionHash][e1.logIndex].timestamp)
+      );
 
     res.end(JSON.stringify(userEvents as UserEventsReturn, replacer));
   });
@@ -189,7 +193,7 @@ export function registerRoutes(app: Express, storage: Storage) {
       .map((chainTasks) => Object.values(chainTasks))
       .flat(1).length;
 
-    res.end(JSON.stringify({ totalTasks: totalTasks } as TotalTasksReturn));
+    res.end(JSON.stringify({ totalTasks: totalTasks } as TotalTasksReturn, replacer));
   });
 
   // Get total event count
@@ -203,8 +207,9 @@ export function registerRoutes(app: Express, storage: Storage) {
           .flat(1)
           .map((transactionEvents) => Object.values(transactionEvents))
           .flat(1)
-          .toSorted((e1, e2) => Number(e1.timestamp - e2.timestamp))
-          .slice(0, 5) as RecentEventsReturn
+          .toSorted((e1, e2) => Number(e2.timestamp - e1.timestamp))
+          .slice(0, 5) as RecentEventsReturn,
+        replacer
       )
     );
   });
@@ -214,7 +219,7 @@ export function registerRoutes(app: Express, storage: Storage) {
     const users = await storage.users.get();
     const totalUsers = Object.keys(users).length;
 
-    res.end(JSON.stringify({ totalUsers: totalUsers } as TotalUsersReturn));
+    res.end(JSON.stringify({ totalUsers: totalUsers } as TotalUsersReturn, replacer));
   });
 
   // Get total usd value of all created tasks
@@ -226,7 +231,7 @@ export function registerRoutes(app: Express, storage: Storage) {
       .map((task) => task.usdValue)
       .reduce((sum, val) => (sum += val), 0);
 
-    res.end(JSON.stringify({ totalUsdValue: totalUsdValue } as TotalUsdValueReturn));
+    res.end(JSON.stringify({ totalUsdValue: totalUsdValue } as TotalUsdValueReturn, replacer));
   });
 
   // Update the metadata of a user
@@ -397,11 +402,11 @@ export function registerRoutes(app: Express, storage: Storage) {
           return {
             ...rfpInfo,
             lastUpdated: rfps[rfpInfo.chainId][rfpInfo.rfpId.toString()].events
-              .map((event) => rfpEvents[event.chainId]?.[event.transactionHash]?.[event.logIndex].timestamp)
+              .map((event) => rfpEvents[event.chainId]?.[event.transactionHash]?.[event.logIndex]?.timestamp ?? BigInt(0))
               .reduce((prev, cur) => (cur > prev ? cur : prev), BigInt(0)),
           };
         })
-        .sort((rfpInfo1, rfpInfo2) => Number(rfpInfo1.lastUpdated - rfpInfo2.lastUpdated));
+        .sort((rfpInfo1, rfpInfo2) => Number(rfpInfo2.lastUpdated - rfpInfo1.lastUpdated));
 
       res.end(JSON.stringify(filterRFPs as FilterRFPsReturn, replacer));
     } catch (error: any) {
@@ -417,7 +422,7 @@ export function registerRoutes(app: Express, storage: Storage) {
       .map((chainRFPs) => Object.values(chainRFPs))
       .flat(1).length;
 
-    res.end(JSON.stringify({ totalRFPs: totalRFPs } as TotalRFPsReturn));
+    res.end(JSON.stringify({ totalRFPs: totalRFPs } as TotalRFPsReturn, replacer));
   });
 
   // Get total rfp event count
@@ -431,8 +436,9 @@ export function registerRoutes(app: Express, storage: Storage) {
           .flat(1)
           .map((transactionEvents) => Object.values(transactionEvents))
           .flat(1)
-          .toSorted((e1, e2) => Number(e1.timestamp - e2.timestamp))
-          .slice(0, 5) as RecentRFPEventsReturn
+          .toSorted((e1, e2) => Number(e2.timestamp - e1.timestamp))
+          .slice(0, 5) as RecentRFPEventsReturn,
+        replacer
       )
     );
   });
