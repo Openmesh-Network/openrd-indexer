@@ -10,6 +10,7 @@ import { addEvent, createTaskIfNotExists } from "../taskHelpers.js";
 import { createDisputeTaskIfNotExists } from "./disputeHelpers.js";
 import { fetchMetadata } from "../../utils/metadata-fetch.js";
 import { normalizeAddress } from "../../utils/normalize-address.js";
+import { addTaskEvent, getTimestamp } from "../eventHelpers.js";
 
 export function watchDisputeCreated(contractWatcher: ContractWatcher, storage: Storage) {
   contractWatcher.startWatching("DisputeCreated", {
@@ -20,7 +21,7 @@ export function watchDisputeCreated(contractWatcher: ContractWatcher, storage: S
     onLogs: async (logs) => {
       await Promise.all(
         logs.map(async (log) => {
-          const { args, blockNumber, transactionHash, address } = log;
+          const { args, blockNumber, transactionHash, address, logIndex } = log;
 
           const event = {
             type: "DisputeCreated",
@@ -28,6 +29,8 @@ export function watchDisputeCreated(contractWatcher: ContractWatcher, storage: S
             transactionHash,
             chainId: contractWatcher.chain.id,
             address: address,
+            logIndex: logIndex,
+            timestamp: await getTimestamp(contractWatcher.chain.id, blockNumber),
             ...args,
           } as DisputeCreated;
 
@@ -40,13 +43,12 @@ export function watchDisputeCreated(contractWatcher: ContractWatcher, storage: S
 
 export async function proccessDisputeCreated(event: DisputeCreated, storage: Storage): Promise<void> {
   let alreadyProcessed = false;
-  let taskEvent: number;
   await storage.tasksEvents.update((tasksEvents) => {
-    if (tasksEvents.some((e) => e.transactionHash === event.transactionHash)) {
+    if (tasksEvents[event.chainId]?.[event.transactionHash]?.[event.logIndex] !== undefined) {
       alreadyProcessed = true;
       return;
     }
-    taskEvent = tasksEvents.push(event) - 1;
+    addTaskEvent(tasksEvents, event);
   });
   if (alreadyProcessed) {
     return;
@@ -109,7 +111,7 @@ export async function proccessDisputeCreated(event: DisputeCreated, storage: Sto
     const task = tasks[event.chainId][taskId];
     if (event.dao === task.disputeManager) {
       // Otherwise someone created a request to some random DAO (without dispute permission on this task)
-      addEvent(task, taskEvent);
+      addEvent(task, event);
     }
   });
 

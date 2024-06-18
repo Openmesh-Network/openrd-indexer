@@ -18,9 +18,7 @@ export interface TotalTasksReturn {
   totalTasks: number;
 }
 
-export interface TotalEventsReturn {
-  totalEvents: number;
-}
+export type RecentEventsReturn = TaskEvent[];
 
 export interface TotalUsersReturn {
   totalUsers: number;
@@ -46,6 +44,4 @@ export interface TotalRFPsReturn {
   totalRFPs: number;
 }
 
-export interface TotalRFPEventsReturn {
-  totalRFPEvents: number;
-}
+export type RecentRFPEventsReturn = RFPEvent[];

@@ -26,8 +26,8 @@ export async function historySync(watcher: MultichainWatcher, chainId: number, f
     for (let j = 0; j < logs.length; j++) {
       // Process logs 1 by one in order to prevent race conditions
       await watcher.processLogs(chainId, [logs[j]]);
+      await new Promise((resolve) => setTimeout(resolve, 100)); // Stay under RPC limits
     }
-    await new Promise((resolve) => setTimeout(resolve, 1000)); // Stay under RPC limits
   }
   console.log("Sync finished!");
 }

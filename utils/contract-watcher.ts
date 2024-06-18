@@ -56,8 +56,9 @@ export class ContractWatcher {
       start: () => {
         this.watching[watchId].stop = this.client.watchContractEvent({
           ...parameters,
-          onError: (err) => {
+          onError: async (err) => {
             console.error(`Watching ${watchId} on chain ${this.chain.id} error: ${err.message}`);
+            await new Promise((resolve) => setTimeout(resolve, 60 * 1000)); // Wait 1 minute to prevent hitting rate limits on errors
             this.watching[watchId].stop();
             this.watching[watchId].start();
           },

@@ -3,6 +3,7 @@ import { TasksContract } from "../contracts/Tasks.js";
 import { DeadlineChanged } from "../types/task-events.js";
 import { ContractWatcher } from "../utils/contract-watcher.js";
 import { addEvent, createTaskIfNotExists } from "./taskHelpers.js";
+import { addTaskEvent, getTimestamp } from "./eventHelpers.js";
 
 export function watchDeadlineChanged(contractWatcher: ContractWatcher, storage: Storage) {
   contractWatcher.startWatching("DeadlineChanged", {
@@ -13,7 +14,7 @@ export function watchDeadlineChanged(contractWatcher: ContractWatcher, storage: 
     onLogs: async (logs) => {
       await Promise.all(
         logs.map(async (log) => {
-          const { args, blockNumber, transactionHash, address } = log;
+          const { args, blockNumber, transactionHash, address, logIndex } = log;
 
           const event = {
             type: "DeadlineChanged",
@@ -21,6 +22,8 @@ export function watchDeadlineChanged(contractWatcher: ContractWatcher, storage: 
             transactionHash,
             chainId: contractWatcher.chain.id,
             address: address,
+            logIndex: logIndex,
+            timestamp: await getTimestamp(contractWatcher.chain.id, blockNumber),
             ...args,
           } as DeadlineChanged;
 
@@ -33,13 +36,12 @@ export function watchDeadlineChanged(contractWatcher: ContractWatcher, storage: 
 
 export async function processDeadlineChanged(event: DeadlineChanged, storage: Storage): Promise<void> {
   let alreadyProcessed = false;
-  let taskEvent: number;
   await storage.tasksEvents.update((tasksEvents) => {
-    if (tasksEvents.some((e) => e.transactionHash === event.transactionHash)) {
+    if (tasksEvents[event.chainId]?.[event.transactionHash]?.[event.logIndex] !== undefined) {
       alreadyProcessed = true;
       return;
     }
-    taskEvent = tasksEvents.push(event) - 1;
+    addTaskEvent(tasksEvents, event);
   });
   if (alreadyProcessed) {
     return;
@@ -51,6 +53,6 @@ export async function processDeadlineChanged(event: DeadlineChanged, storage: St
     const task = tasks[event.chainId][taskId];
     task.deadline = event.newDeadline;
 
-    addEvent(task, taskEvent);
+    addEvent(task, event);
   });
 }

@@ -1,5 +1,6 @@
 import { Address } from "viem";
 import { NativeReward, Reward } from "./tasks.js";
+import { EventIdentifier } from "./event-identifier.js";
 
 export interface Project {
   metadata: string;
@@ -31,9 +32,7 @@ export interface RFP {
 export interface IndexedRFP extends RFP {
   projects: { [projectId: number]: IndexedProject };
 
-  createdAt: number;
-  lastUpdated: number;
-  events: number[];
+  events: EventIdentifier[];
   cachedMetadata: string;
   usdValue: number;
 }

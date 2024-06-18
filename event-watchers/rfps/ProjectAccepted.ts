@@ -5,7 +5,8 @@ import { ContractWatcher } from "../../utils/contract-watcher.js";
 import { publicClients } from "../../utils/chain-cache.js";
 import { RFPsContract } from "../../contracts/RFPs.js";
 import { ProjectAccepted } from "../../types/rfp-events.js";
-import { createProjectIfNotExists } from "./rfpsHelpers.js";
+import { addEvent, createProjectIfNotExists } from "./rfpsHelpers.js";
+import { addRFPEvent, getTimestamp } from "../eventHelpers.js";
 
 export function watchProjectAccepted(contractWatcher: ContractWatcher, storage: Storage) {
   contractWatcher.startWatching("ProjectAccepted", {
@@ -16,7 +17,7 @@ export function watchProjectAccepted(contractWatcher: ContractWatcher, storage: 
     onLogs: async (logs) => {
       await Promise.all(
         logs.map(async (log) => {
-          const { args, blockNumber, transactionHash, address } = log;
+          const { args, blockNumber, transactionHash, address, logIndex } = log;
 
           const event = {
             type: "ProjectAccepted",
@@ -24,6 +25,8 @@ export function watchProjectAccepted(contractWatcher: ContractWatcher, storage: 
             transactionHash: transactionHash,
             chainId: contractWatcher.chain.id,
             address: address,
+            logIndex: logIndex,
+            timestamp: await getTimestamp(contractWatcher.chain.id, blockNumber),
             ...args,
           } as ProjectAccepted;
 
@@ -36,13 +39,12 @@ export function watchProjectAccepted(contractWatcher: ContractWatcher, storage: 
 
 export async function processProjectAccepted(event: ProjectAccepted, storage: Storage): Promise<void> {
   let alreadyProcessed = false;
-  let rfpEvent: number;
   await storage.rfpsEvents.update((rfpsEvents) => {
-    if (rfpsEvents.some((e) => e.transactionHash === event.transactionHash)) {
+    if (rfpsEvents[event.chainId]?.[event.transactionHash]?.[event.logIndex] !== undefined) {
       alreadyProcessed = true;
       return;
     }
-    rfpEvent = rfpsEvents.push(event) - 1;
+    addRFPEvent(rfpsEvents, event);
   });
   if (alreadyProcessed) {
     return;
@@ -56,7 +58,7 @@ export async function processProjectAccepted(event: ProjectAccepted, storage: St
     project.accepted = true;
     project.taskId = event.taskId;
 
-    rfp.events.push(rfpEvent);
+    addEvent(rfp, event);
   });
 
   await Promise.all(

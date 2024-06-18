@@ -4,6 +4,7 @@ import { MetadataChanged } from "../types/task-events.js";
 import { ContractWatcher } from "../utils/contract-watcher.js";
 import { fetchMetadata } from "../utils/metadata-fetch.js";
 import { addEvent, createTaskIfNotExists } from "./taskHelpers.js";
+import { addTaskEvent, getTimestamp } from "./eventHelpers.js";
 
 export function watchMetadataChanged(contractWatcher: ContractWatcher, storage: Storage) {
   contractWatcher.startWatching("MetadataChanged", {
@@ -14,7 +15,7 @@ export function watchMetadataChanged(contractWatcher: ContractWatcher, storage: 
     onLogs: async (logs) => {
       await Promise.all(
         logs.map(async (log) => {
-          const { args, blockNumber, transactionHash, address } = log;
+          const { args, blockNumber, transactionHash, address, logIndex } = log;
 
           const event = {
             type: "MetadataChanged",
@@ -22,6 +23,8 @@ export function watchMetadataChanged(contractWatcher: ContractWatcher, storage: 
             transactionHash,
             chainId: contractWatcher.chain.id,
             address: address,
+            logIndex: logIndex,
+            timestamp: await getTimestamp(contractWatcher.chain.id, blockNumber),
             ...args,
           } as MetadataChanged;
 
@@ -34,13 +37,12 @@ export function watchMetadataChanged(contractWatcher: ContractWatcher, storage: 
 
 export async function processMetadataChanged(event: MetadataChanged, storage: Storage): Promise<void> {
   let alreadyProcessed = false;
-  let taskEvent: number;
   await storage.tasksEvents.update((tasksEvents) => {
-    if (tasksEvents.some((e) => e.transactionHash === event.transactionHash)) {
+    if (tasksEvents[event.chainId]?.[event.transactionHash]?.[event.logIndex] !== undefined) {
       alreadyProcessed = true;
       return;
     }
-    taskEvent = tasksEvents.push(event) - 1;
+    addTaskEvent(tasksEvents, event);
   });
   if (alreadyProcessed) {
     return;
@@ -52,7 +54,7 @@ export async function processMetadataChanged(event: MetadataChanged, storage: St
     const task = tasks[event.chainId][taskId];
     task.metadata = event.newMetadata;
 
-    addEvent(task, taskEvent);
+    addEvent(task, event);
   });
 
   await fetchMetadata(event.newMetadata)

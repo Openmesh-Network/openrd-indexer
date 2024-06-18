@@ -1,12 +1,12 @@
-import { Address, Hex } from "viem";
+import { Address } from "viem";
 
 import { ERC20Transfer, NativeReward, PreapprovedApplication, RequestType, Reward, SubmissionJudgement, TaskCompletionSource } from "./tasks.js";
+import { EventIdentifier } from "./event-identifier.js";
 
-export interface TaskEventBase {
+export interface TaskEventBase extends EventIdentifier {
   blockNumber: bigint;
-  transactionHash: Hex;
-  chainId: number;
   address: Address;
+  timestamp: bigint;
 }
 
 export type TaskEvent =

@@ -5,7 +5,8 @@ import { ContractWatcher } from "../../utils/contract-watcher.js";
 import { publicClients } from "../../utils/chain-cache.js";
 import { RFPsContract } from "../../contracts/RFPs.js";
 import { RFPEmptied } from "../../types/rfp-events.js";
-import { createRFPIfNotExists } from "./rfpsHelpers.js";
+import { addEvent, createRFPIfNotExists } from "./rfpsHelpers.js";
+import { addRFPEvent, getTimestamp } from "../eventHelpers.js";
 
 export function watchRFPEmptied(contractWatcher: ContractWatcher, storage: Storage) {
   contractWatcher.startWatching("RFPEmptied", {
@@ -16,7 +17,7 @@ export function watchRFPEmptied(contractWatcher: ContractWatcher, storage: Stora
     onLogs: async (logs) => {
       await Promise.all(
         logs.map(async (log) => {
-          const { args, blockNumber, transactionHash, address } = log;
+          const { args, blockNumber, transactionHash, address, logIndex } = log;
 
           const event = {
             type: "RFPEmptied",
@@ -24,6 +25,8 @@ export function watchRFPEmptied(contractWatcher: ContractWatcher, storage: Stora
             transactionHash: transactionHash,
             chainId: contractWatcher.chain.id,
             address: address,
+            logIndex: logIndex,
+            timestamp: await getTimestamp(contractWatcher.chain.id, blockNumber),
             ...args,
           } as RFPEmptied;
 
@@ -36,13 +39,12 @@ export function watchRFPEmptied(contractWatcher: ContractWatcher, storage: Stora
 
 export async function processRFPEmptied(event: RFPEmptied, storage: Storage): Promise<void> {
   let alreadyProcessed = false;
-  let rfpEvent: number;
   await storage.rfpsEvents.update((rfpsEvents) => {
-    if (rfpsEvents.some((e) => e.transactionHash === event.transactionHash)) {
+    if (rfpsEvents[event.chainId]?.[event.transactionHash]?.[event.logIndex] !== undefined) {
       alreadyProcessed = true;
       return;
     }
-    rfpEvent = rfpsEvents.push(event) - 1;
+    addRFPEvent(rfpsEvents, event);
   });
   if (alreadyProcessed) {
     return;
@@ -53,7 +55,7 @@ export async function processRFPEmptied(event: RFPEmptied, storage: Storage): Pr
     createRFPIfNotExists(rfps, event.chainId, rfpId);
     const rfp = rfps[event.chainId][rfpId];
 
-    rfp.events.push(rfpEvent);
+    addEvent(rfp, event);
   });
 
   await Promise.all(

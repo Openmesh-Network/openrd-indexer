@@ -3,7 +3,8 @@ import { ContractWatcher } from "../../utils/contract-watcher.js";
 import { fetchMetadata } from "../../utils/metadata-fetch.js";
 import { RFPsContract } from "../../contracts/RFPs.js";
 import { ProjectSubmitted } from "../../types/rfp-events.js";
-import { createProjectIfNotExists } from "./rfpsHelpers.js";
+import { addEvent, createProjectIfNotExists } from "./rfpsHelpers.js";
+import { addRFPEvent, getTimestamp } from "../eventHelpers.js";
 
 export function watchProjectSubmitted(contractWatcher: ContractWatcher, storage: Storage) {
   contractWatcher.startWatching("ProjectSubmitted", {
@@ -14,7 +15,7 @@ export function watchProjectSubmitted(contractWatcher: ContractWatcher, storage:
     onLogs: async (logs) => {
       await Promise.all(
         logs.map(async (log) => {
-          const { args, blockNumber, transactionHash, address } = log;
+          const { args, blockNumber, transactionHash, address, logIndex } = log;
 
           const event = {
             type: "ProjectSubmitted",
@@ -22,6 +23,8 @@ export function watchProjectSubmitted(contractWatcher: ContractWatcher, storage:
             transactionHash: transactionHash,
             chainId: contractWatcher.chain.id,
             address: address,
+            logIndex: logIndex,
+            timestamp: await getTimestamp(contractWatcher.chain.id, blockNumber),
             ...args,
           } as ProjectSubmitted;
 
@@ -34,13 +37,12 @@ export function watchProjectSubmitted(contractWatcher: ContractWatcher, storage:
 
 export async function processProjectSubmitted(event: ProjectSubmitted, storage: Storage): Promise<void> {
   let alreadyProcessed = false;
-  let rfpEvent: number;
   await storage.rfpsEvents.update((rfpsEvents) => {
-    if (rfpsEvents.some((e) => e.transactionHash === event.transactionHash)) {
+    if (rfpsEvents[event.chainId]?.[event.transactionHash]?.[event.logIndex] !== undefined) {
       alreadyProcessed = true;
       return;
     }
-    rfpEvent = rfpsEvents.push(event) - 1;
+    addRFPEvent(rfpsEvents, event);
   });
   if (alreadyProcessed) {
     return;
@@ -57,7 +59,7 @@ export async function processProjectSubmitted(event: ProjectSubmitted, storage: 
     project.nativeReward = [...event.nativeReward];
     project.reward = [...event.reward];
 
-    rfp.events.push(rfpEvent);
+    addEvent(rfp, event);
   });
 
   fetchMetadata(event.metadata)

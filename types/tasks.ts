@@ -1,4 +1,5 @@
 import { Address } from "viem";
+import { EventIdentifier } from "./event-identifier.js";
 
 export interface ERC20Transfer {
   tokenContract: Address;
@@ -97,9 +98,7 @@ export interface IndexedTask extends Task {
   cancelTaskRequests: { [requestId: number]: IndexedCancelTaskRequest };
 
   completionSource?: TaskCompletionSource;
-  createdAt: number;
-  lastUpdated: number;
-  events: number[];
+  events: EventIdentifier[];
   cachedMetadata: string;
   usdValue: number;
   nativePaidOut: bigint[];

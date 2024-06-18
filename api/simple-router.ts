@@ -89,6 +89,7 @@ export function registerRoutes(app: Express, storage: Storage) {
       const filter: ObjectFilter = JSON.parse(JSON.stringify(req.body), reviver);
 
       const tasks = await storage.tasks.get();
+      const tasksEvents = await storage.tasksEvents.get();
       const filterTasks = Object.keys(tasks)
         .map((chainId) =>
           Object.keys(tasks[chainId as any as number]).map((taskId) => {
@@ -108,10 +109,15 @@ export function registerRoutes(app: Express, storage: Storage) {
           }
           return passesObjectFilter(task, filter);
         })
-        .sort(
-          (taskInfo1, taskInfo2) =>
-            tasks[taskInfo2.chainId][taskInfo2.taskId.toString()].lastUpdated - tasks[taskInfo1.chainId][taskInfo1.taskId.toString()].lastUpdated
-        );
+        .map((taskInfo) => {
+          return {
+            ...taskInfo,
+            lastUpdated: tasks[taskInfo.chainId][taskInfo.taskId.toString()].events
+              .map((event) => tasksEvents[event.chainId]?.[event.transactionHash]?.[event.logIndex].timestamp)
+              .reduce((prev, cur) => (cur > prev ? cur : prev), BigInt(0)),
+          };
+        })
+        .sort((taskInfo1, taskInfo2) => Number(taskInfo1.lastUpdated - taskInfo2.lastUpdated));
 
       res.end(JSON.stringify(filterTasks, replacer));
     } catch (error: any) {
@@ -159,11 +165,10 @@ export function registerRoutes(app: Express, storage: Storage) {
   });
 
   // Get total event count
-  app.get(basePath + "totalEvents", async function (_, res) {
+  app.get(basePath + "recentEvents", async function (_, res) {
     const tasksEvents = await storage.tasksEvents.get();
-    const totalEvents = tasksEvents.length;
 
-    res.end(JSON.stringify({ totalEvents: totalEvents }));
+    res.end(JSON.stringify(Object.values(tasksEvents).slice(-5)));
   });
 
   // Get total user count
@@ -320,6 +325,7 @@ export function registerRoutes(app: Express, storage: Storage) {
       const filter: ObjectFilter = JSON.parse(JSON.stringify(req.body), reviver);
 
       const rfps = await storage.rfps.get();
+      const rfpEvents = await storage.rfpsEvents.get();
       const filterRFPs = Object.keys(rfps)
         .map((chainId) =>
           Object.keys(rfps[chainId as any as number]).map((rfpId) => {
@@ -339,9 +345,15 @@ export function registerRoutes(app: Express, storage: Storage) {
           }
           return passesObjectFilter(rfp, filter);
         })
-        .sort(
-          (rfpInfo1, rfpInfo2) => rfps[rfpInfo2.chainId][rfpInfo2.rfpId.toString()].lastUpdated - rfps[rfpInfo1.chainId][rfpInfo1.rfpId.toString()].lastUpdated
-        );
+        .map((rfpInfo) => {
+          return {
+            ...rfpInfo,
+            lastUpdated: rfps[rfpInfo.chainId][rfpInfo.rfpId.toString()].events
+              .map((event) => rfpEvents[event.chainId]?.[event.transactionHash]?.[event.logIndex].timestamp)
+              .reduce((prev, cur) => (cur > prev ? cur : prev), BigInt(0)),
+          };
+        })
+        .sort((rfpInfo1, rfpInfo2) => Number(rfpInfo1.lastUpdated - rfpInfo2.lastUpdated));
 
       res.end(JSON.stringify(filterRFPs, replacer));
     } catch (error: any) {
@@ -361,10 +373,9 @@ export function registerRoutes(app: Express, storage: Storage) {
   });
 
   // Get total rfp event count
-  app.get(basePath + "totalRFPEvents", async function (_, res) {
+  app.get(basePath + "recentRFPEvents", async function (_, res) {
     const rfpsEvents = await storage.rfpsEvents.get();
-    const totalEvents = rfpsEvents.length;
 
-    res.end(JSON.stringify({ totalRFPEvents: totalEvents }));
+    res.end(JSON.stringify(Object.values(rfpsEvents).slice(-5)));
   });
 }

@@ -7,7 +7,8 @@ import { getPrice } from "../../utils/get-token-price.js";
 import { chains, publicClients } from "../../utils/chain-cache.js";
 import { RFPsContract } from "../../contracts/RFPs.js";
 import { RFPCreated } from "../../types/rfp-events.js";
-import { createRFPIfNotExists } from "./rfpsHelpers.js";
+import { addEvent, createRFPIfNotExists } from "./rfpsHelpers.js";
+import { addRFPEvent, getTimestamp } from "../eventHelpers.js";
 
 export function watchRFPCreated(contractWatcher: ContractWatcher, storage: Storage) {
   contractWatcher.startWatching("RFPCreated", {
@@ -18,7 +19,7 @@ export function watchRFPCreated(contractWatcher: ContractWatcher, storage: Stora
     onLogs: async (logs) => {
       await Promise.all(
         logs.map(async (log) => {
-          const { args, blockNumber, transactionHash, address } = log;
+          const { args, blockNumber, transactionHash, address, logIndex } = log;
 
           const event = {
             type: "RFPCreated",
@@ -26,6 +27,8 @@ export function watchRFPCreated(contractWatcher: ContractWatcher, storage: Stora
             transactionHash: transactionHash,
             chainId: contractWatcher.chain.id,
             address: address,
+            logIndex: logIndex,
+            timestamp: await getTimestamp(contractWatcher.chain.id, blockNumber),
             ...args,
           } as RFPCreated;
 
@@ -38,13 +41,12 @@ export function watchRFPCreated(contractWatcher: ContractWatcher, storage: Stora
 
 export async function processRFPCreated(event: RFPCreated, storage: Storage): Promise<void> {
   let alreadyProcessed = false;
-  let rfpEvent: number;
   await storage.rfpsEvents.update((rfpsEvents) => {
-    if (rfpsEvents.some((e) => e.transactionHash === event.transactionHash)) {
+    if (rfpsEvents[event.chainId]?.[event.transactionHash]?.[event.logIndex] !== undefined) {
       alreadyProcessed = true;
       return;
     }
-    rfpEvent = rfpsEvents.push(event) - 1;
+    addRFPEvent(rfpsEvents, event);
   });
   if (alreadyProcessed) {
     return;
@@ -67,7 +69,7 @@ export async function processRFPCreated(event: RFPCreated, storage: Storage): Pr
       };
     });
 
-    rfp.events.push(rfpEvent);
+    addEvent(rfp, event);
   });
 
   await Promise.all([

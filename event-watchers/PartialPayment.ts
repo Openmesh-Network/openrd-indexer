@@ -3,6 +3,7 @@ import { TasksContract } from "../contracts/Tasks.js";
 import { PartialPayment } from "../types/task-events.js";
 import { ContractWatcher } from "../utils/contract-watcher.js";
 import { addEvent, createTaskIfNotExists } from "./taskHelpers.js";
+import { addTaskEvent, getTimestamp } from "./eventHelpers.js";
 
 export function watchPartialPayment(contractWatcher: ContractWatcher, storage: Storage) {
   contractWatcher.startWatching("PartialPayment", {
@@ -13,7 +14,7 @@ export function watchPartialPayment(contractWatcher: ContractWatcher, storage: S
     onLogs: async (logs) => {
       await Promise.all(
         logs.map(async (log) => {
-          const { args, blockNumber, transactionHash, address } = log;
+          const { args, blockNumber, transactionHash, address, logIndex } = log;
 
           const event = {
             type: "PartialPayment",
@@ -21,6 +22,8 @@ export function watchPartialPayment(contractWatcher: ContractWatcher, storage: S
             transactionHash,
             chainId: contractWatcher.chain.id,
             address: address,
+            logIndex: logIndex,
+            timestamp: await getTimestamp(contractWatcher.chain.id, blockNumber),
             ...args,
           } as PartialPayment;
 
@@ -33,13 +36,12 @@ export function watchPartialPayment(contractWatcher: ContractWatcher, storage: S
 
 export async function processPartialPayment(event: PartialPayment, storage: Storage): Promise<void> {
   let alreadyProcessed = false;
-  let taskEvent: number;
   await storage.tasksEvents.update((tasksEvents) => {
-    if (tasksEvents.some((e) => e.transactionHash === event.transactionHash)) {
+    if (tasksEvents[event.chainId]?.[event.transactionHash]?.[event.logIndex] !== undefined) {
       alreadyProcessed = true;
       return;
     }
-    taskEvent = tasksEvents.push(event) - 1;
+    addTaskEvent(tasksEvents, event);
   });
   if (alreadyProcessed) {
     return;
@@ -74,7 +76,7 @@ export async function processPartialPayment(event: PartialPayment, storage: Stor
       }
     });
 
-    addEvent(task, taskEvent);
+    addEvent(task, event);
   });
 
   // Do we also wanna keep track of the usd value of the payout?

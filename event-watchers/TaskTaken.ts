@@ -7,6 +7,7 @@ import { ContractWatcher } from "../utils/contract-watcher.js";
 import { normalizeAddress } from "../utils/normalize-address.js";
 import { addEvent, createApplicationIfNotExists } from "./taskHelpers.js";
 import { createUserTaskIfNotExists } from "./userHelpers.js";
+import { addTaskEvent, getTimestamp } from "./eventHelpers.js";
 
 export function watchTaskTaken(contractWatcher: ContractWatcher, storage: Storage) {
   contractWatcher.startWatching("TaskTaken", {
@@ -17,7 +18,7 @@ export function watchTaskTaken(contractWatcher: ContractWatcher, storage: Storag
     onLogs: async (logs) => {
       await Promise.all(
         logs.map(async (log) => {
-          const { args, blockNumber, transactionHash, address } = log;
+          const { args, blockNumber, transactionHash, address, logIndex } = log;
 
           const event = {
             type: "TaskTaken",
@@ -25,6 +26,8 @@ export function watchTaskTaken(contractWatcher: ContractWatcher, storage: Storag
             transactionHash,
             chainId: contractWatcher.chain.id,
             address: address,
+            logIndex: logIndex,
+            timestamp: await getTimestamp(contractWatcher.chain.id, blockNumber),
             ...args,
           } as TaskTaken;
 
@@ -37,13 +40,12 @@ export function watchTaskTaken(contractWatcher: ContractWatcher, storage: Storag
 
 export async function processTaskTaken(event: TaskTaken, storage: Storage): Promise<void> {
   let alreadyProcessed = false;
-  let taskEvent: number;
   await storage.tasksEvents.update((tasksEvents) => {
-    if (tasksEvents.some((e) => e.transactionHash === event.transactionHash)) {
+    if (tasksEvents[event.chainId]?.[event.transactionHash]?.[event.logIndex] !== undefined) {
       alreadyProcessed = true;
       return;
     }
-    taskEvent = tasksEvents.push(event) - 1;
+    addTaskEvent(tasksEvents, event);
   });
   if (alreadyProcessed) {
     return;
@@ -56,7 +58,7 @@ export async function processTaskTaken(event: TaskTaken, storage: Storage): Prom
     task.state = TaskState.Taken;
     task.executorApplication = event.applicationId;
 
-    addEvent(task, taskEvent);
+    addEvent(task, event);
   });
 
   const application = await storage.tasks.get().then((task) => task[event.chainId][taskId].applications[event.applicationId]);

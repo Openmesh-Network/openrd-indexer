@@ -1,5 +1,7 @@
 import { zeroAddress } from "viem";
 import { RFPsStorage } from "../../types/storage.js";
+import { IndexedRFP } from "../../types/rfp.js";
+import { RFPEvent } from "../../types/rfp-events.js";
 
 export function createChainIfNotExists(rfps: RFPsStorage, chainId: number): void {
   if (!rfps[chainId]) {
@@ -21,8 +23,6 @@ export function createRFPIfNotExists(rfps: RFPsStorage, chainId: number, rfpId: 
       projects: {},
       tasksManager: zeroAddress,
 
-      createdAt: Math.round(new Date().getTime() / 1000),
-      lastUpdated: Math.round(new Date().getTime() / 1000),
       events: [],
       cachedMetadata: "",
       usdValue: 0,
@@ -46,4 +46,8 @@ export function createProjectIfNotExists(rfps: RFPsStorage, chainId: number, rfp
       usdValue: 0,
     };
   }
+}
+
+export function addEvent(rfp: IndexedRFP, event: RFPEvent): void {
+  rfp.events.push({ chainId: event.chainId, transactionHash: event.transactionHash, logIndex: event.logIndex });
 }

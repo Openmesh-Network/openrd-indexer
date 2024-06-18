@@ -3,6 +3,7 @@ import { TasksContract } from "../contracts/Tasks.js";
 import { ApplicationAccepted } from "../types/task-events.js";
 import { ContractWatcher } from "../utils/contract-watcher.js";
 import { addEvent, createApplicationIfNotExists } from "./taskHelpers.js";
+import { addTaskEvent, getTimestamp } from "./eventHelpers.js";
 
 export function watchApplicationAccepted(contractWatcher: ContractWatcher, storage: Storage) {
   contractWatcher.startWatching("ApplicationAccepted", {
@@ -13,7 +14,7 @@ export function watchApplicationAccepted(contractWatcher: ContractWatcher, stora
     onLogs: async (logs) => {
       await Promise.all(
         logs.map(async (log) => {
-          const { args, blockNumber, transactionHash, address } = log;
+          const { args, blockNumber, transactionHash, address, logIndex } = log;
 
           const event = {
             type: "ApplicationAccepted",
@@ -21,6 +22,8 @@ export function watchApplicationAccepted(contractWatcher: ContractWatcher, stora
             transactionHash,
             chainId: contractWatcher.chain.id,
             address: address,
+            logIndex: logIndex,
+            timestamp: await getTimestamp(contractWatcher.chain.id, blockNumber),
             ...args,
           } as ApplicationAccepted;
 
@@ -33,13 +36,12 @@ export function watchApplicationAccepted(contractWatcher: ContractWatcher, stora
 
 export async function processApplicationAccepted(event: ApplicationAccepted, storage: Storage): Promise<void> {
   let alreadyProcessed = false;
-  let taskEvent: number;
   await storage.tasksEvents.update((tasksEvents) => {
-    if (tasksEvents.some((e) => e.transactionHash === event.transactionHash)) {
+    if (tasksEvents[event.chainId]?.[event.transactionHash]?.[event.logIndex] !== undefined) {
       alreadyProcessed = true;
       return;
     }
-    taskEvent = tasksEvents.push(event) - 1;
+    addTaskEvent(tasksEvents, event);
   });
   if (alreadyProcessed) {
     return;
@@ -52,6 +54,6 @@ export async function processApplicationAccepted(event: ApplicationAccepted, sto
     const application = task.applications[event.applicationId];
     application.accepted = true;
 
-    addEvent(task, taskEvent);
+    addEvent(task, event);
   });
 }

@@ -3,7 +3,7 @@ import { IndexedDispute, IndexedDraft, IndexedTask } from "./tasks.js";
 import { User } from "./user.js";
 import { IndexedRFP } from "./rfp.js";
 import { RFPEvent } from "./rfp-events.js";
-import { Address } from "viem";
+import { Address, Hex } from "viem";
 import { PersistentJson } from "../utils/persistent-json.js";
 
 export interface TasksStorage {
@@ -11,7 +11,13 @@ export interface TasksStorage {
     [taskId: string]: IndexedTask;
   };
 }
-export type TasksEventsStorage = TaskEvent[];
+export type TasksEventsStorage = {
+  [chainId: number]: {
+    [transactionHash: Hex]: {
+      [logIndex: number]: TaskEvent;
+    };
+  };
+};
 export interface UsersStorage {
   [address: Address]: User;
 }
@@ -32,7 +38,13 @@ export interface RFPsStorage {
     [rfpId: string]: IndexedRFP;
   };
 }
-export type RFPsEventsStorage = RFPEvent[];
+export type RFPsEventsStorage = {
+  [chainId: number]: {
+    [transactionHash: Hex]: {
+      [logIndex: number]: RFPEvent;
+    };
+  };
+};
 
 export interface Storage {
   tasks: PersistentJson<TasksStorage>;

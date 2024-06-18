@@ -7,6 +7,7 @@ import { fetchMetadata } from "../utils/metadata-fetch.js";
 import { normalizeAddress } from "../utils/normalize-address.js";
 import { addEvent, createApplicationIfNotExists } from "./taskHelpers.js";
 import { createUserTaskIfNotExists } from "./userHelpers.js";
+import { addTaskEvent, getTimestamp } from "./eventHelpers.js";
 
 export function watchApplicationCreated(contractWatcher: ContractWatcher, storage: Storage) {
   contractWatcher.startWatching("ApplicationCreated", {
@@ -17,7 +18,7 @@ export function watchApplicationCreated(contractWatcher: ContractWatcher, storag
     onLogs: async (logs) => {
       await Promise.all(
         logs.map(async (log) => {
-          const { args, blockNumber, transactionHash, address } = log;
+          const { args, blockNumber, transactionHash, address, logIndex } = log;
 
           const event = {
             type: "ApplicationCreated",
@@ -25,6 +26,8 @@ export function watchApplicationCreated(contractWatcher: ContractWatcher, storag
             transactionHash,
             chainId: contractWatcher.chain.id,
             address: address,
+            logIndex: logIndex,
+            timestamp: await getTimestamp(contractWatcher.chain.id, blockNumber),
             ...args,
           } as ApplicationCreated;
 
@@ -37,13 +40,12 @@ export function watchApplicationCreated(contractWatcher: ContractWatcher, storag
 
 export async function proccessApplicationCreated(event: ApplicationCreated, storage: Storage): Promise<void> {
   let alreadyProcessed = false;
-  let taskEvent: number;
   await storage.tasksEvents.update((tasksEvents) => {
-    if (tasksEvents.some((e) => e.transactionHash === event.transactionHash)) {
+    if (tasksEvents[event.chainId]?.[event.transactionHash]?.[event.logIndex] !== undefined) {
       alreadyProcessed = true;
       return;
     }
-    taskEvent = tasksEvents.push(event) - 1;
+    addTaskEvent(tasksEvents, event);
   });
   if (alreadyProcessed) {
     return;
@@ -59,7 +61,7 @@ export async function proccessApplicationCreated(event: ApplicationCreated, stor
     application.nativeReward = [...event.nativeReward];
     application.reward = [...event.reward];
 
-    addEvent(task, taskEvent);
+    addEvent(task, event);
   });
 
   await storage.users.update((users) => {

@@ -1,11 +1,11 @@
 import { Address } from "viem";
 import { ERC20Transfer, NativeReward, Reward } from "./tasks.js";
+import { EventIdentifier } from "./event-identifier.js";
 
-export interface RFPEventBase {
+export interface RFPEventBase extends EventIdentifier {
   blockNumber: bigint;
-  transactionHash: string;
-  chainId: number;
   address: Address;
+  timestamp: bigint;
 }
 
 export type RFPEvent = RFPCreated | ProjectSubmitted | ProjectAccepted | RFPEmptied;

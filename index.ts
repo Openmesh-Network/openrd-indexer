@@ -1,5 +1,5 @@
 import { config as loadEnv } from "dotenv";
-import express from "express";
+import express, { application } from "express";
 import storageManager from "node-persist";
 import { arbitrumSepolia, mainnet, polygon, sepolia } from "viem/chains";
 
@@ -38,6 +38,9 @@ import { TasksContract } from "./contracts/Tasks.js";
 import { RFPsContract } from "./contracts/RFPs.js";
 import { TaskDisputesContract } from "./contracts/TaskDisputes.js";
 import { TaskDraftsContract } from "./contracts/TaskDrafts.js";
+import { fetchMetadata } from "./utils/metadata-fetch.js";
+import { getPrice } from "./utils/get-token-price.js";
+import { chains } from "./utils/chain-cache.js";
 
 async function start() {
   const loadEnvResult = loadEnv();
@@ -59,24 +62,24 @@ async function start() {
       chain: polygon,
       rpc: `polygon-mainnet.infura.io/ws/v3/${process.env.INFURA_API_KEY}`,
     },
-    {
-      chain: arbitrumSepolia,
-      rpc: `arbitrum-sepolia.infura.io/ws/v3/${process.env.INFURA_API_KEY}`,
-    },
+    // {
+    //   chain: arbitrumSepolia,
+    //   rpc: `arbitrum-sepolia.infura.io/ws/v3/${process.env.INFURA_API_KEY}`,
+    // },
   ]);
 
   // Data (memory + json files (synced) currently, could be migrated to a database solution if needed in the future)
   await storageManager.init({ dir: "storage" });
   const storage = {
     tasks: new PersistentJson<TasksStorage>("tasks", {}),
-    tasksEvents: new PersistentJson<TasksEventsStorage>("tasksEvents", []),
+    tasksEvents: new PersistentJson<TasksEventsStorage>("tasksEvents", {}),
     users: new PersistentJson<UsersStorage>("users", {}),
 
     disputes: new PersistentJson<DisputesStorage>("disputes", {}),
     drafts: new PersistentJson<DraftsStorage>("drafts", {}),
 
     rfps: new PersistentJson<RFPsStorage>("rfps", {}),
-    rfpsEvents: new PersistentJson<RFPsEventsStorage>("rfpsEvents", []),
+    rfpsEvents: new PersistentJson<RFPsEventsStorage>("rfpsEvents", {}),
   };
 
   multichainWatcher.forEach((contractWatcher) => {
@@ -158,17 +161,56 @@ async function start() {
           TaskDraftsContract.address,
         ]).catch((err) => console.error(`Error while executing history sync: ${err}`));
       }
-      if (command.startsWith("setUSD ")) {
-        // In case the current USD value is not representative (weird price spike)
+      if (command.startsWith("refetch ")) {
+        // In case some information is outdated
         const args = command.split(" ").slice(1);
         const chainId = Number(args[0]);
-        const taskId = BigInt(args[1]).toString();
-        const usdValue = Number(args[2]);
+        const taskId = Number(args[1]);
         storage.tasks
-          .update((tasks) => {
-            tasks[chainId][taskId].usdValue = usdValue;
+          .get()
+          .then(async (tasks) => {
+            const task = tasks[chainId][taskId];
+            if (!task.cachedMetadata) {
+              console.log("Refetching metadata");
+              const metadata = await fetchMetadata(task.metadata);
+              await storage.tasks.update((tasks) => {
+                tasks[chainId][taskId].cachedMetadata = metadata;
+              });
+            }
+            if (task.usdValue === 0) {
+              console.log("Refetching usd value");
+              const usdValue = await getPrice(chains[chainId], task.nativeBudget, task.budget);
+              await storage.tasks.update((tasks) => {
+                tasks[chainId][taskId].usdValue = usdValue;
+              });
+            }
+            await Promise.all(
+              Object.keys(task.applications).map(async (applicationId) => {
+                const application = task.applications[applicationId as any as number];
+                if (!application.cachedMetadata) {
+                  console.log(`Refetching metadata of application ${applicationId}`);
+                  const metadata = await fetchMetadata(application.metadata);
+                  await storage.tasks.update((tasks) => {
+                    tasks[chainId][taskId].applications[applicationId as any as number].cachedMetadata = metadata;
+                  });
+                }
+              })
+            );
+            await Promise.all(
+              Object.keys(task.submissions).map(async (submissionId) => {
+                const submission = task.submissions[submissionId as any as number];
+                if (!submission.cachedMetadata) {
+                  console.log(`Refetching metadata of submission ${submissionId}`);
+                  const metadata = await fetchMetadata(submission.metadata);
+                  await storage.tasks.update((tasks) => {
+                    tasks[chainId][taskId].submissions[submissionId as any as number].cachedMetadata = metadata;
+                  });
+                }
+              })
+            );
           })
-          .catch((err) => console.error(`Error while executing set USD: ${err}`));
+          .then(() => console.log("Refetch finished!"))
+          .catch((err) => console.error(`Error while executing refetch: ${err}`));
       }
       if (command.startsWith("syncUserMetadata")) {
         // Download user metadata from remote

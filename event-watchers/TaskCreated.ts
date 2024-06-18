@@ -11,6 +11,7 @@ import { fetchMetadata } from "../utils/metadata-fetch.js";
 import { addEvent, createTaskIfNotExists } from "./taskHelpers.js";
 import { createUserTaskIfNotExists } from "./userHelpers.js";
 import { normalizeAddress } from "../utils/normalize-address.js";
+import { addTaskEvent, getTimestamp } from "./eventHelpers.js";
 
 export function watchTaskCreated(contractWatcher: ContractWatcher, storage: Storage) {
   contractWatcher.startWatching("TaskCreated", {
@@ -21,7 +22,7 @@ export function watchTaskCreated(contractWatcher: ContractWatcher, storage: Stor
     onLogs: async (logs) => {
       await Promise.all(
         logs.map(async (log) => {
-          const { args, blockNumber, transactionHash, address } = log;
+          const { args, blockNumber, transactionHash, address, logIndex } = log;
 
           const event = {
             type: "TaskCreated",
@@ -29,6 +30,8 @@ export function watchTaskCreated(contractWatcher: ContractWatcher, storage: Stor
             transactionHash: transactionHash,
             chainId: contractWatcher.chain.id,
             address: address,
+            logIndex: logIndex,
+            timestamp: await getTimestamp(contractWatcher.chain.id, blockNumber),
             ...args,
           } as TaskCreated;
 
@@ -41,13 +44,12 @@ export function watchTaskCreated(contractWatcher: ContractWatcher, storage: Stor
 
 export async function processTaskCreated(event: TaskCreated, storage: Storage): Promise<void> {
   let alreadyProcessed = false;
-  let taskEvent: number;
   await storage.tasksEvents.update((tasksEvents) => {
-    if (tasksEvents.some((e) => e.transactionHash === event.transactionHash)) {
+    if (tasksEvents[event.chainId]?.[event.transactionHash]?.[event.logIndex] !== undefined) {
       alreadyProcessed = true;
       return;
     }
-    taskEvent = tasksEvents.push(event) - 1;
+    addTaskEvent(tasksEvents, event);
   });
   if (alreadyProcessed) {
     return;
@@ -66,7 +68,7 @@ export async function processTaskCreated(event: TaskCreated, storage: Storage): 
     task.budget = [...event.budget];
     task.escrow = event.escrow;
 
-    addEvent(task, taskEvent);
+    addEvent(task, event);
   });
 
   await storage.users.update((users) => {
