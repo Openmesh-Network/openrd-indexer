@@ -1,5 +1,5 @@
 import { Express, Response, json } from "express";
-import { isAddress } from "viem";
+import { isAddress, isHex } from "viem";
 
 import { Storage } from "../types/storage.js";
 import { IndexedTask } from "../types/tasks.js";
@@ -10,6 +10,24 @@ import { ObjectFilter, passesObjectFilter } from "./filter.js";
 import { fetchMetadata } from "../utils/metadata-fetch.js";
 import { publicClients } from "../utils/chain-cache.js";
 import { normalizeAddress } from "../utils/normalize-address.js";
+import {
+  DisputesReturn,
+  DraftsReturn,
+  EventReturn,
+  FilterRFPsReturn,
+  FilterTasksReturn,
+  RFPEventReturn,
+  RFPReturn,
+  RecentEventsReturn,
+  RecentRFPEventsReturn,
+  TaskReturn,
+  TotalRFPsReturn,
+  TotalTasksReturn,
+  TotalUsdValueReturn,
+  TotalUsersReturn,
+  UserEventsReturn,
+  UserReturn,
+} from "./return-types.js";
 
 function malformedRequest(res: Response, error: string): void {
   res.statusCode = 400;
@@ -38,31 +56,41 @@ export function registerRoutes(app: Express, storage: Storage) {
       return res.end("Chain not found");
     }
 
-    const task = tasks[chainId][taskId.toString()];
+    const task = tasks[chainId]?.[taskId.toString()];
     if (!task) {
       res.statusCode = 404;
       return res.end("Task not found");
     }
 
-    res.end(JSON.stringify(task, replacer));
+    res.end(JSON.stringify(task as TaskReturn, replacer));
   });
 
-  // Get single event (newer events have higher index)
-  app.get(basePath + "event/:eventIndex", async function (req, res) {
-    const eventIndex = parseInt(req.params.eventIndex);
-    if (Number.isNaN(eventIndex)) {
-      return malformedRequest(res, "eventIndex is not a valid number");
+  // Get single event
+  app.get(basePath + "event/:chainId/:transactionHash/:logIndex", async function (req, res) {
+    const chainId = parseInt(req.params.chainId);
+    if (Number.isNaN(chainId)) {
+      return malformedRequest(res, "chainId is not a valid number");
+    }
+
+    const transactionHash = req.params.transactionHash;
+    if (!isHex(transactionHash)) {
+      return malformedRequest(res, "transactionHash is not in a valid hex format");
+    }
+
+    const logIndex = parseInt(req.params.logIndex);
+    if (Number.isNaN(logIndex)) {
+      return malformedRequest(res, "logIndex is not a valid number");
     }
 
     const tasksEvents = await storage.tasksEvents.get();
-    const event = tasksEvents[eventIndex];
+    const event = tasksEvents[chainId]?.[transactionHash]?.[logIndex];
 
     if (!event) {
       res.statusCode = 404;
       return res.end("Event not found");
     }
 
-    res.end(JSON.stringify(event, replacer));
+    res.end(JSON.stringify(event as EventReturn, replacer));
   });
 
   // Get single user
@@ -80,7 +108,7 @@ export function registerRoutes(app: Express, storage: Storage) {
       return res.end("User not found");
     }
 
-    res.end(JSON.stringify(user, replacer));
+    res.end(JSON.stringify(user as UserReturn, replacer));
   });
 
   // Get all tasks that pass a certain filter
@@ -119,7 +147,7 @@ export function registerRoutes(app: Express, storage: Storage) {
         })
         .sort((taskInfo1, taskInfo2) => Number(taskInfo1.lastUpdated - taskInfo2.lastUpdated));
 
-      res.end(JSON.stringify(filterTasks, replacer));
+      res.end(JSON.stringify(filterTasks as FilterTasksReturn, replacer));
     } catch (error: any) {
       res.statusCode = 500;
       res.end(JSON.stringify({ error: error?.message ?? "Unknown error" }));
@@ -151,7 +179,7 @@ export function registerRoutes(app: Express, storage: Storage) {
       .flat(1)
       .flatMap((taskInfo) => tasks[taskInfo.chainId][taskInfo.taskId.toString()].events);
 
-    res.end(JSON.stringify(userEvents, replacer));
+    res.end(JSON.stringify(userEvents as UserEventsReturn, replacer));
   });
 
   // Get total task count
@@ -161,14 +189,24 @@ export function registerRoutes(app: Express, storage: Storage) {
       .map((chainTasks) => Object.values(chainTasks))
       .flat(1).length;
 
-    res.end(JSON.stringify({ totalTasks: totalTasks }));
+    res.end(JSON.stringify({ totalTasks: totalTasks } as TotalTasksReturn));
   });
 
   // Get total event count
   app.get(basePath + "recentEvents", async function (_, res) {
     const tasksEvents = await storage.tasksEvents.get();
 
-    res.end(JSON.stringify(Object.values(tasksEvents).slice(-5)));
+    res.end(
+      JSON.stringify(
+        Object.values(tasksEvents)
+          .map((chainEvents) => Object.values(chainEvents))
+          .flat(1)
+          .map((transactionEvents) => Object.values(transactionEvents))
+          .flat(1)
+          .toSorted((e1, e2) => Number(e1.timestamp - e2.timestamp))
+          .slice(0, 5) as RecentEventsReturn
+      )
+    );
   });
 
   // Get total user count
@@ -176,7 +214,7 @@ export function registerRoutes(app: Express, storage: Storage) {
     const users = await storage.users.get();
     const totalUsers = Object.keys(users).length;
 
-    res.end(JSON.stringify({ totalUsers: totalUsers }));
+    res.end(JSON.stringify({ totalUsers: totalUsers } as TotalUsersReturn));
   });
 
   // Get total usd value of all created tasks
@@ -188,7 +226,7 @@ export function registerRoutes(app: Express, storage: Storage) {
       .map((task) => task.usdValue)
       .reduce((sum, val) => (sum += val), 0);
 
-    res.end(JSON.stringify({ totalUsdValue: totalUsdValue }));
+    res.end(JSON.stringify({ totalUsdValue: totalUsdValue } as TotalUsdValueReturn));
   });
 
   // Update the metadata of a user
@@ -244,7 +282,7 @@ export function registerRoutes(app: Express, storage: Storage) {
       return res.end("Task disputes not found");
     }
 
-    res.end(JSON.stringify(taskDisputes, replacer));
+    res.end(JSON.stringify(taskDisputes as DisputesReturn, replacer));
   });
 
   // Get drafts of single dao
@@ -271,7 +309,7 @@ export function registerRoutes(app: Express, storage: Storage) {
       return res.end("Task drafts not found");
     }
 
-    res.end(JSON.stringify(taskDrafts, replacer));
+    res.end(JSON.stringify(taskDrafts as DraftsReturn, replacer));
   });
 
   // Get single rfp
@@ -298,25 +336,35 @@ export function registerRoutes(app: Express, storage: Storage) {
       return res.end("RFP not found");
     }
 
-    res.end(JSON.stringify(rfp, replacer));
+    res.end(JSON.stringify(rfp as RFPReturn, replacer));
   });
 
   // Get single rfp event (newer events have higher index)
-  app.get(basePath + "rfpEvent/:eventIndex", async function (req, res) {
-    const eventIndex = parseInt(req.params.eventIndex);
-    if (Number.isNaN(eventIndex)) {
-      return malformedRequest(res, "eventIndex is not a valid number");
+  app.get(basePath + "rfpEvent/:chainId/:transactionHash/:logIndex", async function (req, res) {
+    const chainId = parseInt(req.params.chainId);
+    if (Number.isNaN(chainId)) {
+      return malformedRequest(res, "chainId is not a valid number");
+    }
+
+    const transactionHash = req.params.transactionHash;
+    if (!isHex(transactionHash)) {
+      return malformedRequest(res, "transactionHash is not in a valid hex format");
+    }
+
+    const logIndex = parseInt(req.params.logIndex);
+    if (Number.isNaN(logIndex)) {
+      return malformedRequest(res, "logIndex is not a valid number");
     }
 
     const rfpsEvents = await storage.rfpsEvents.get();
-    const event = rfpsEvents[eventIndex];
+    const event = rfpsEvents[chainId]?.[transactionHash]?.[logIndex];
 
     if (!event) {
       res.statusCode = 404;
       return res.end("RFP event not found");
     }
 
-    res.end(JSON.stringify(event, replacer));
+    res.end(JSON.stringify(event as RFPEventReturn, replacer));
   });
 
   // Get all tasks that pass a certain filter
@@ -355,7 +403,7 @@ export function registerRoutes(app: Express, storage: Storage) {
         })
         .sort((rfpInfo1, rfpInfo2) => Number(rfpInfo1.lastUpdated - rfpInfo2.lastUpdated));
 
-      res.end(JSON.stringify(filterRFPs, replacer));
+      res.end(JSON.stringify(filterRFPs as FilterRFPsReturn, replacer));
     } catch (error: any) {
       res.statusCode = 500;
       res.end(JSON.stringify({ error: error?.message ?? "Unknown error" }));
@@ -369,13 +417,23 @@ export function registerRoutes(app: Express, storage: Storage) {
       .map((chainRFPs) => Object.values(chainRFPs))
       .flat(1).length;
 
-    res.end(JSON.stringify({ totalRFPs: totalRFPs }));
+    res.end(JSON.stringify({ totalRFPs: totalRFPs } as TotalRFPsReturn));
   });
 
   // Get total rfp event count
   app.get(basePath + "recentRFPEvents", async function (_, res) {
     const rfpsEvents = await storage.rfpsEvents.get();
 
-    res.end(JSON.stringify(Object.values(rfpsEvents).slice(-5)));
+    res.end(
+      JSON.stringify(
+        Object.values(rfpsEvents)
+          .map((chainEvents) => Object.values(chainEvents))
+          .flat(1)
+          .map((transactionEvents) => Object.values(transactionEvents))
+          .flat(1)
+          .toSorted((e1, e2) => Number(e1.timestamp - e2.timestamp))
+          .slice(0, 5) as RecentRFPEventsReturn
+      )
+    );
   });
 }

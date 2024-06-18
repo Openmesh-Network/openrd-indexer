@@ -1,3 +1,4 @@
+import { EventIdentifier } from "../types/event-identifier.js";
 import { RFPEvent } from "../types/rfp-events.js";
 import { IndexedRFP } from "../types/rfp.js";
 import { TaskEvent } from "../types/task-events.js";
@@ -12,7 +13,7 @@ export type UserReturn = User;
 
 export type FilterTasksReturn = { chainId: number; taskId: bigint }[];
 
-export type UserEventsReturn = number[];
+export type UserEventsReturn = EventIdentifier[];
 
 export interface TotalTasksReturn {
   totalTasks: number;
