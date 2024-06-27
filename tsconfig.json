@@ -6,7 +6,8 @@
     "strict": true,
     "strictNullChecks": true,
     "esModuleInterop": true,
-    "outDir": "build"
+    "outDir": "build",
+    "skipLibCheck": true
   },
   "exclude": ["node_modules"]
 }
