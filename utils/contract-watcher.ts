@@ -10,6 +10,7 @@ export class ContractWatcher {
   private watching: {
     [watchId: string]: { start: () => void; stop: () => void; tryProcess: (logs: Log[]) => void };
   };
+  private timeoutError: boolean;
 
   public getWatched(): string[] {
     return Object.keys(this.watching);
@@ -41,6 +42,8 @@ export class ContractWatcher {
     // Expose this info for other classes to use
     chains[this.chain.id] = this.chain;
     publicClients[this.chain.id] = this.client;
+
+    this.timeoutError = false;
   }
 
   public startWatching<
@@ -57,9 +60,15 @@ export class ContractWatcher {
         this.watching[watchId].stop = this.client.watchContractEvent({
           ...parameters,
           onError: async (err) => {
+            if (this.timeoutError) {
+              // Prevents error triggering multiple times
+              return;
+            }
+            this.timeoutError = true;
             console.error(`Watching ${watchId} on chain ${this.chain.id} error: ${err.message}`);
             await new Promise((resolve) => setTimeout(resolve, 60 * 1000)); // Wait 1 minute to prevent hitting rate limits on errors
             this.watching[watchId].stop();
+            this.timeoutError = false;
             this.watching[watchId].start();
           },
         });

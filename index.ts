@@ -62,10 +62,10 @@ async function start() {
       chain: polygon,
       rpc: `polygon-mainnet.infura.io/ws/v3/${process.env.INFURA_API_KEY}`,
     },
-    // {
-    //   chain: arbitrumSepolia,
-    //   rpc: `arbitrum-sepolia.infura.io/ws/v3/${process.env.INFURA_API_KEY}`,
-    // },
+    {
+      chain: arbitrumSepolia,
+      rpc: `arbitrum-sepolia.infura.io/ws/v3/${process.env.INFURA_API_KEY}`,
+    },
   ]);
 
   // Data (memory + json files (synced) currently, could be migrated to a database solution if needed in the future)
