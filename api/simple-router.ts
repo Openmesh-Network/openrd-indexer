@@ -1,8 +1,8 @@
 import { Express, Response, json } from "express";
-import { isAddress, isHex } from "viem";
+import { isAddress, isHex, zeroAddress } from "viem";
 
 import { Storage } from "../types/storage.js";
-import { IndexedTask } from "../types/tasks.js";
+import { IndexedTask, TaskState } from "../types/tasks.js";
 import { replacer, reviver } from "../utils/json.js";
 import { parseBigInt } from "../utils/parseBigInt.js";
 import { createUserIfNotExists } from "../event-watchers/userHelpers.js";
@@ -28,6 +28,7 @@ import {
   UserEventsReturn,
   UserReturn,
 } from "./return-types.js";
+import { TaskRole } from "../types/user.js";
 
 function malformedRequest(res: Response, error: string): void {
   res.statusCode = 400;
@@ -179,6 +180,38 @@ export function registerRoutes(app: Express, storage: Storage) {
       )
       .flat(1)
       .flatMap((taskInfo) => tasks[taskInfo.chainId][taskInfo.taskId.toString()].events)
+      .filter((e) => {
+        const taskEvent = tasksEvents[e.chainId][e.transactionHash][e.logIndex];
+        if (taskEvent.type !== "TaskDraftCreated" && taskEvent.type !== "DisputeCreated") {
+          if (user.tasks[taskEvent.chainId][taskEvent.taskId.toString()].includes(TaskRole.Manager)) {
+            // We care about all events
+            return true;
+          }
+
+          const task = tasks[taskEvent.chainId][taskEvent.taskId.toString()];
+          if (
+            task.state > TaskState.Open &&
+            normalizeAddress(task.applications[task.executorApplication]?.applicant ?? zeroAddress) !== normalizeAddress(address)
+          ) {
+            // We dont care about applications we are not the executor
+            return false;
+          }
+        }
+        if (taskEvent.type === "ApplicationCreated") {
+          if (normalizeAddress(taskEvent.applicant) != normalizeAddress(address)) {
+            // Not out application
+            return false;
+          }
+        }
+        if (taskEvent.type === "ApplicationAccepted") {
+          const task = tasks[taskEvent.chainId][taskEvent.taskId.toString()];
+          if (normalizeAddress(task.applications[taskEvent.applicationId]?.applicant ?? zeroAddress) != normalizeAddress(address)) {
+            // Not out application
+            return false;
+          }
+        }
+        return true;
+      })
       .toSorted((e1, e2) =>
         Number(tasksEvents[e2.chainId][e2.transactionHash][e2.logIndex].timestamp - tasksEvents[e1.chainId][e1.transactionHash][e1.logIndex].timestamp)
       );
